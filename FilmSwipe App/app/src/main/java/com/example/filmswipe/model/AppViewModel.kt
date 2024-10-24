@@ -23,8 +23,10 @@ class AppViewModel: ViewModel() {
         }
         else{
             _uiState.update{
-                    currentState -> currentState.copy(
-                incorrectLogin = true
+                currentState -> currentState.copy(
+                    incorrectLogin = true,
+                    isLoggedIn = false
+
             )
             }
         }

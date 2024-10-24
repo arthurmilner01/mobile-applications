@@ -4,21 +4,31 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -26,6 +36,22 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.filmswipe.model.AppViewModel
 import com.example.filmswipe.ui.theme.FilmSwipeTheme
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextField
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.google.android.gms.wallet.button.ButtonConstants
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,55 +70,94 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigator(modifier:Modifier = Modifier){
     val navController = rememberNavController()
+    val appViewModel: AppViewModel = viewModel()
     NavHost(
         navController = navController,
         startDestination = "loginscreen"
     ){
-        composable("loginscreen") { LoginScreen(navController) }
-        composable("homescreen") { HomeScreen(navController) }
-        composable("profilescreen") { ProfileScreen(navController) }
+        composable("loginscreen") { LoginScreen(navController, appViewModel) }
+        composable("homescreen") { HomeScreen(navController, appViewModel) }
+        composable("profilescreen") { ProfileScreen(navController, appViewModel) }
     }
 }
 
 @Composable
-fun LoginScreen(navController:NavController, appViewModel:AppViewModel=viewModel(), modifier:Modifier=Modifier) {
+fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier:Modifier=Modifier) {
     val appUiState by appViewModel.uiState.collectAsState()
+    val loginImage = painterResource(R.drawable.filmswipelogo)
+
+    LaunchedEffect(appUiState.isLoggedIn) {
+        if (appUiState.isLoggedIn) {
+            navController.navigate("homescreen")
+        }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
+            .background(colorResource(id=R.color.Background))
     )
     {
+        Image(painter=loginImage,
+            contentDescription = "App Logo",
+            modifier=Modifier
+                .padding(top=10.dp,bottom=10.dp, start=25.dp, end=25.dp)
+                .size(200.dp))
+
         Text(
-            text = "Login !",
+            text = "Login:",
             modifier = modifier
+                .padding(10.dp),
+            color = Color.White,
+            style = TextStyle(
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Blue
+            )
         )
         OutlinedTextField(
             value = appViewModel.emailInput,
             onValueChange = { appViewModel.updateEmailInput(it) },
-            isError=appUiState.incorrectLogin,
-            label = { Text("Email") }
+            isError = appUiState.incorrectLogin,
+            label = { Text("Email", color = Color.White) },
+            modifier = Modifier
+                .padding(10.dp)
         )
         OutlinedTextField(
             value = appViewModel.passwordInput,
             onValueChange = { appViewModel.updatePasswordInput(it) },
-            isError=appUiState.incorrectLogin,
-            label = { Text("Password") }
+            isError = appUiState.incorrectLogin,
+            label = { Text("Password", color = Color.White) },
+            modifier = Modifier
+                .padding(10.dp)
         )
-        Button(onClick = {
-            appViewModel.checkLoginDetails()
-            if(appUiState.isLoggedIn){
-            navController.navigate("homescreen")
-        }
-        }) {
+        Button(
+            onClick = { appViewModel.checkLoginDetails() }, modifier=Modifier
+                .padding(10.dp)
+                .size(width = 200.dp, height = 50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(id=R.color.PrimaryButton))
+        )
+        {
             Text("Login")
+        }
+        Button(
+            onClick = {},
+            modifier=Modifier
+                .padding(10.dp)
+                .size(width = 200.dp, height = 50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(id=R.color.SecondaryButton))
+        )
+        {
+            Text("Sign-Up")
         }
     }
 }
 
 @Composable
-fun HomeScreen(navController:NavController, appViewModel:AppViewModel=viewModel(), modifier: Modifier=Modifier){
+fun HomeScreen(navController:NavController, appViewModel:AppViewModel, modifier: Modifier=Modifier){
     val appUiState by appViewModel.uiState.collectAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -107,7 +172,7 @@ fun HomeScreen(navController:NavController, appViewModel:AppViewModel=viewModel(
 }
 
 @Composable
-fun ProfileScreen(navController:NavController,appViewModel:AppViewModel=viewModel(), modifier: Modifier=Modifier){
+fun ProfileScreen(navController:NavController,appViewModel:AppViewModel, modifier: Modifier=Modifier){
     val appUiState by appViewModel.uiState.collectAsState()
 
     Column(
@@ -124,7 +189,7 @@ fun ProfileScreen(navController:NavController,appViewModel:AppViewModel=viewMode
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun AppPreview() {
     FilmSwipeTheme {
         AppNavigator()
     }
