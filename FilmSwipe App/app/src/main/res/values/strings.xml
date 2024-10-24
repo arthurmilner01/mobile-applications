@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FilmSwipe</string>
+    <string name="login_email">Currently Logged In: %s</string>
 </resources>
