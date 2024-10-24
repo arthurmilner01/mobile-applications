@@ -105,17 +105,6 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
                 .padding(top=10.dp,bottom=10.dp, start=25.dp, end=25.dp)
                 .size(200.dp))
 
-        Text(
-            text = "Login:",
-            modifier = modifier
-                .padding(10.dp),
-            color = Color.White,
-            style = TextStyle(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Blue
-            )
-        )
         OutlinedTextField(
             value = appViewModel.emailInput,
             onValueChange = { appViewModel.updateEmailInput(it) },
