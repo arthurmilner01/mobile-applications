@@ -40,10 +40,17 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.TextField
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
@@ -51,7 +58,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.google.android.gms.wallet.button.ButtonConstants
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,14 +77,12 @@ class MainActivity : ComponentActivity() {
 fun AppNavigator(modifier:Modifier = Modifier){
     val navController = rememberNavController()
     val appViewModel: AppViewModel = viewModel()
-    NavHost(
-        navController = navController,
-        startDestination = "loginscreen"
-    ){
+    NavHost(navController = navController, startDestination = "loginscreen"){
         composable("loginscreen") { LoginScreen(navController, appViewModel) }
         composable("homescreen") { HomeScreen(navController, appViewModel) }
         composable("profilescreen") { ProfileScreen(navController, appViewModel) }
     }
+    BottomNavigationBar(navController, appViewModel)
 }
 
 @Composable
@@ -173,6 +177,35 @@ fun ProfileScreen(navController:NavController,appViewModel:AppViewModel, modifie
             text = "Profile!",
             modifier = modifier
         )
+    }
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel){
+    val appUiState by appViewModel.uiState.collectAsState()
+    val items = listOf("Home", "Profile")
+    val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.Person)
+    val unselectedIcons = listOf(Icons.Outlined.Home, Icons.Outlined.Person)
+
+    if(appUiState.isLoggedIn){
+        NavigationBar {
+            items.forEachIndexed { index, item ->
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            if (appUiState.navSelectedItem == index) selectedIcons[index] else unselectedIcons[index],
+                            contentDescription = item
+                        )
+                    },
+                    label = { Text(item) },
+                    selected = index == appUiState.navSelectedItem,
+                    onClick = {
+                        appViewModel.changeNavSelectedItem(index)
+                        navController.navigate(route = item.plus("screen"))
+                    }
+                )
+            }
+        }
     }
 }
 

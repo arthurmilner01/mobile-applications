@@ -26,7 +26,6 @@ class AppViewModel: ViewModel() {
                 currentState -> currentState.copy(
                     incorrectLogin = true,
                     isLoggedIn = false
-
             )
             }
         }
@@ -49,4 +48,14 @@ class AppViewModel: ViewModel() {
         )
         }
     }
+
+    //Nav bar funcs
+    fun changeNavSelectedItem(index:Int){
+        _uiState.update{
+            currentState -> currentState.copy(
+                navSelectedItem = index
+        )}
+    }
+
 }
+

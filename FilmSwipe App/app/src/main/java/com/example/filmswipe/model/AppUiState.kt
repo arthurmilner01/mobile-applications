@@ -3,5 +3,6 @@ package com.example.filmswipe.model
 data class AppUiState(
     val incorrectLogin:Boolean = false,
     val isLoggedIn:Boolean = false,
-    val loggedInEmail:String = ""
+    val loggedInEmail:String = "",
+    val navSelectedItem:Int = 0
 )
