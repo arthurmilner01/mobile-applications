@@ -42,8 +42,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -90,6 +92,7 @@ fun AppNavigator(modifier:Modifier = Modifier, navController: NavController, app
         composable("loginscreen") { LoginScreen(navController, appViewModel, modifier) }
         composable("homescreen") { HomeScreen(navController, appViewModel, modifier) }
         composable("profilescreen") { ProfileScreen(navController, appViewModel, modifier) }
+        composable("settingsscreen") { SettingsScreen(navController, appViewModel, modifier) }
     }
 }
 
@@ -189,11 +192,27 @@ fun ProfileScreen(navController:NavController,appViewModel:AppViewModel, modifie
 }
 
 @Composable
+fun SettingsScreen(navController:NavController,appViewModel:AppViewModel, modifier: Modifier=Modifier){
+    val appUiState by appViewModel.uiState.collectAsState()
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = "Settings!",
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
 fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel){
     val appUiState by appViewModel.uiState.collectAsState()
-    val items = listOf("Home", "Profile")
-    val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.Person)
-    val unselectedIcons = listOf(Icons.Outlined.Home, Icons.Outlined.Person)
+    val items = listOf("Home", "Profile","Settings")
+    val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.Person, Icons.Filled.Settings)
+    val unselectedIcons = listOf(Icons.Outlined.Home, Icons.Outlined.Person, Icons.Outlined.Settings)
 
     if(appUiState.isLoggedIn){
         NavigationBar {
