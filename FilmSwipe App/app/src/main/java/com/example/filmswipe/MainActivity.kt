@@ -87,7 +87,9 @@ fun AppNavigator(modifier:Modifier = Modifier, navController: NavController, app
     NavHost(
         navController = navController as NavHostController,
         startDestination = "loginscreen",
-        modifier=modifier)
+        modifier=modifier
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize())
     {
         composable("loginscreen") { LoginScreen(navController, appViewModel, modifier) }
         composable("homescreen") { HomeScreen(navController, appViewModel, modifier) }
@@ -110,21 +112,25 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+        modifier = Modifier
     )
     {
         Image(painter=loginImage,
             contentDescription = "App Logo",
             modifier=Modifier
-                .padding(top=10.dp,bottom=10.dp, start=25.dp, end=25.dp)
-                .size(200.dp))
+                .padding(top=10.dp,
+                    bottom=10.dp,
+                    start=25.dp,
+                    end=25.dp)
+                .size(200.dp)
+        )
 
         OutlinedTextField(
             value = appViewModel.emailInput,
             onValueChange = { appViewModel.updateEmailInput(it) },
             isError = appUiState.incorrectLogin,
-            label = { Text("Email", color = MaterialTheme.colorScheme.onBackground) },
+            label = { Text("Email",
+                color = MaterialTheme.colorScheme.onBackground) },
             modifier = Modifier
                 .padding(10.dp)
         )
@@ -132,7 +138,8 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
             value = appViewModel.passwordInput,
             onValueChange = { appViewModel.updatePasswordInput(it) },
             isError = appUiState.incorrectLogin,
-            label = { Text("Password", color = MaterialTheme.colorScheme.onBackground) },
+            label = { Text("Password",
+                color = MaterialTheme.colorScheme.onBackground)},
             modifier = Modifier
                 .padding(10.dp)
         )
@@ -235,7 +242,10 @@ fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel
                             contentDescription = item
                         )
                     },
-                    label = { Text(item) },
+                    label = {Text(
+                        item,
+                        style=MaterialTheme.typography.labelSmall
+                    )},
                     selected = index == appUiState.navSelectedItem,
                     onClick = {
                         appViewModel.changeNavSelectedItem(index)
