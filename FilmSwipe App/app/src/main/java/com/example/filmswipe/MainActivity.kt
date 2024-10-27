@@ -111,7 +111,7 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
-            .background(colorResource(id=R.color.Background))
+            .background(MaterialTheme.colorScheme.background)
     )
     {
         Image(painter=loginImage,
@@ -124,7 +124,7 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
             value = appViewModel.emailInput,
             onValueChange = { appViewModel.updateEmailInput(it) },
             isError = appUiState.incorrectLogin,
-            label = { Text("Email", color = Color.White) },
+            label = { Text("Email", color = MaterialTheme.colorScheme.onBackground) },
             modifier = Modifier
                 .padding(10.dp)
         )
@@ -132,7 +132,7 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
             value = appViewModel.passwordInput,
             onValueChange = { appViewModel.updatePasswordInput(it) },
             isError = appUiState.incorrectLogin,
-            label = { Text("Password", color = Color.White) },
+            label = { Text("Password", color = MaterialTheme.colorScheme.onBackground) },
             modifier = Modifier
                 .padding(10.dp)
         )
@@ -141,10 +141,13 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
                 .padding(10.dp)
                 .size(width = 200.dp, height = 50.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(id=R.color.PrimaryButton))
+                containerColor = MaterialTheme.colorScheme.primary)
         )
         {
-            Text("Login")
+            Text(
+                "Login",
+                style=MaterialTheme.typography.bodyMedium
+            )
         }
         Button(
             onClick = {},
@@ -152,10 +155,12 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
                 .padding(10.dp)
                 .size(width = 200.dp, height = 50.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(id=R.color.SecondaryButton))
+                containerColor = MaterialTheme.colorScheme.secondary)
         )
         {
-            Text("Sign-Up")
+            Text(
+                "Sign-Up",
+                style=MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -170,7 +175,8 @@ fun HomeScreen(navController:NavController, appViewModel:AppViewModel, modifier:
     ) {
         Text(
             text = stringResource(R.string.login_email, appUiState.loggedInEmail),
-            modifier = modifier
+            modifier = modifier,
+            style=MaterialTheme.typography.headlineMedium
         )
     }
 }
@@ -186,7 +192,8 @@ fun ProfileScreen(navController:NavController,appViewModel:AppViewModel, modifie
     ) {
         Text(
             text = "Profile!",
-            modifier = modifier
+            modifier = modifier,
+            style= MaterialTheme.typography.headlineMedium
         )
     }
 }
@@ -202,7 +209,8 @@ fun SettingsScreen(navController:NavController,appViewModel:AppViewModel, modifi
     ) {
         Text(
             text = "Settings!",
-            modifier = modifier
+            modifier = modifier,
+            style=MaterialTheme.typography.displayLarge
         )
     }
 }
@@ -215,7 +223,10 @@ fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel
     val unselectedIcons = listOf(Icons.Outlined.Home, Icons.Outlined.Person, Icons.Outlined.Settings)
 
     if(appUiState.isLoggedIn){
-        NavigationBar {
+        NavigationBar(
+            modifier=Modifier
+            .background(MaterialTheme.colorScheme.onBackground)
+        ){
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
                     icon = {
