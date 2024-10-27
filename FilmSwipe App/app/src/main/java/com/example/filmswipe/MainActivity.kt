@@ -57,6 +57,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.google.android.gms.wallet.button.ButtonConstants
 
 class MainActivity : ComponentActivity() {
@@ -65,8 +66,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FilmSwipeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppNavigator(modifier = Modifier.padding(innerPadding))
+                val navController = rememberNavController()
+                val appViewModel: AppViewModel = viewModel()
+
+                Scaffold(modifier = Modifier.fillMaxSize(),
+                    bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
+                    AppNavigator(modifier = Modifier.padding(innerPadding),
+                        navController= navController,
+                        appViewModel=appViewModel)
                 }
             }
         }
@@ -74,15 +81,16 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppNavigator(modifier:Modifier = Modifier){
-    val navController = rememberNavController()
-    val appViewModel: AppViewModel = viewModel()
-    NavHost(navController = navController, startDestination = "loginscreen"){
-        composable("loginscreen") { LoginScreen(navController, appViewModel) }
-        composable("homescreen") { HomeScreen(navController, appViewModel) }
-        composable("profilescreen") { ProfileScreen(navController, appViewModel) }
+fun AppNavigator(modifier:Modifier = Modifier, navController: NavController, appViewModel: AppViewModel){
+    NavHost(
+        navController = navController as NavHostController,
+        startDestination = "loginscreen",
+        modifier=modifier)
+    {
+        composable("loginscreen") { LoginScreen(navController, appViewModel, modifier) }
+        composable("homescreen") { HomeScreen(navController, appViewModel, modifier) }
+        composable("profilescreen") { ProfileScreen(navController, appViewModel, modifier) }
     }
-    BottomNavigationBar(navController, appViewModel)
 }
 
 @Composable
@@ -213,6 +221,12 @@ fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel
 @Composable
 fun AppPreview() {
     FilmSwipeTheme {
-        AppNavigator()
+        val navController = rememberNavController()
+        val appViewModel: AppViewModel = viewModel()
+
+        Scaffold(modifier = Modifier.fillMaxSize(),
+            bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
+            AppNavigator(modifier = Modifier.padding(innerPadding), navController, appViewModel)
+        }
     }
 }
