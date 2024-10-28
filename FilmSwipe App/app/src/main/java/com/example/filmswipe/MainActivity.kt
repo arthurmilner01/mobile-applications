@@ -107,23 +107,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun AppNavigator(modifier:Modifier = Modifier, navController: NavController, appViewModel: AppViewModel){
-    NavHost(
-        navController = navController as NavHostController,
-        startDestination = "loginscreen",
-        modifier= modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize())
-    {
-        composable("loginscreen") { LoginScreen(navController, appViewModel, modifier) }
-        composable("homescreen") { HomeScreen(navController, appViewModel, modifier) }
-        composable("profilescreen") { ProfileScreen(navController, appViewModel, modifier) }
-        composable("settingsscreen") { SettingsScreen(navController, appViewModel, modifier) }
-    }
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun AppPreview() {
