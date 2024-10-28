@@ -21,7 +21,7 @@ class AppViewModel: ViewModel() {
     fun checkLoginDetails(){
         //TODO: Use database for validation
         if((emailInput.equals("arthur@email.com", ignoreCase=true)) && (passwordInput == "password")){
-            userLogsIn(emailInput=emailInput)
+            userLogsIn(currentEmailInput = emailInput)
         }
         else{
             _uiState.update{
@@ -41,15 +41,28 @@ class AppViewModel: ViewModel() {
         passwordInput = currentPasswordInput
     }
 
-    private fun userLogsIn(emailInput:String){
+    fun userLogsOut(){
+        _uiState.update{
+                currentState -> currentState.copy(
+            isLoggedIn = false,
+            loggedInEmail = "",
+            loggedInUsername = "",
+            incorrectLogin = false
+        )
+        }
+    }
+
+    private fun userLogsIn(currentEmailInput:String){
         _uiState.update{
             currentState -> currentState.copy(
                 isLoggedIn = true,
-                loggedInEmail = emailInput,
+                loggedInEmail = currentEmailInput,
                 loggedInUsername = "tempusername", //TODO: Use username when implemented
                 incorrectLogin = false
         )
         }
+        emailInput = ""
+        passwordInput = ""
     }
 
     //Settings page funcs

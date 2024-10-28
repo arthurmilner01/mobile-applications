@@ -39,9 +39,11 @@ import com.example.filmswipe.model.AppViewModel
 import com.example.filmswipe.ui.theme.FilmSwipeTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -199,6 +201,7 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
 @Composable
 fun HomeScreen(navController:NavController, appViewModel:AppViewModel, modifier: Modifier=Modifier){
     val appUiState by appViewModel.uiState.collectAsState()
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -258,6 +261,13 @@ fun ProfileScreen(navController:NavController,appViewModel:AppViewModel, modifie
 fun SettingsScreen(navController:NavController,appViewModel:AppViewModel, modifier: Modifier=Modifier){
     val appUiState by appViewModel.uiState.collectAsState()
 
+    LaunchedEffect(!appUiState.isLoggedIn) {
+        if (!appUiState.isLoggedIn) {
+            appViewModel.changeNavSelectedItem(0)
+            navController.navigate("loginscreen")
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -293,6 +303,19 @@ fun SettingsScreen(navController:NavController,appViewModel:AppViewModel, modifi
                 checked = appUiState.darkMode,
                 onCheckedChange = { appViewModel.updateDarkModeSetting(it) }
             )
+        }
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+
+        Row(modifier=Modifier
+            .padding(5.dp)
+            .fillMaxWidth()
+            .clickable { appViewModel.userLogsOut() },
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            Text(text = "Log-Out",
+                modifier = modifier,
+                style=MaterialTheme.typography.labelLarge)
         }
 
     }
