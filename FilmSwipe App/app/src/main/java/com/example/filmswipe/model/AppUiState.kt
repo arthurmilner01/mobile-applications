@@ -6,5 +6,7 @@ data class AppUiState(
     val loggedInEmail:String = "",
     val loggedInUsername:String = "",
     val navSelectedItem:Int = 0,
-    val navScreenTitle:String = ""
+    val navScreenTitle:String = "",
+    val enableNotifs:Boolean = true,
+    val darkMode:Boolean = false
 )

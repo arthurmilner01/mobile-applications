@@ -40,6 +40,8 @@ import com.example.filmswipe.ui.theme.FilmSwipeTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -54,12 +56,14 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Switch
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -258,11 +262,38 @@ fun SettingsScreen(navController:NavController,appViewModel:AppViewModel, modifi
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "Settings!",
-            modifier = modifier,
-            style=MaterialTheme.typography.displayLarge
-        )
+        Row(modifier=Modifier
+            .padding(5.dp),
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            Text(text = "Enable Notifications:",
+                modifier = modifier,
+                style=MaterialTheme.typography.labelLarge)
+            Spacer(modifier=Modifier
+                .weight(1f))
+            Switch(
+                checked = appUiState.enableNotifs,
+                onCheckedChange = { appViewModel.updateNotifSetting(it) }
+            )
+        }
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+
+        Row(modifier=Modifier
+            .padding(5.dp),
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            Text(text = "Enable Dark Mode:",
+                modifier = modifier,
+                style=MaterialTheme.typography.labelLarge)
+            Spacer(modifier=Modifier
+                .weight(1f))
+            Switch(
+                checked = appUiState.darkMode,
+                onCheckedChange = { appViewModel.updateDarkModeSetting(it) }
+            )
+        }
+
     }
 }
 

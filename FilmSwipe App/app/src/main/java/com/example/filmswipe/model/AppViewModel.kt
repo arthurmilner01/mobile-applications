@@ -52,6 +52,26 @@ class AppViewModel: ViewModel() {
         }
     }
 
+    //Settings page funcs
+
+    fun updateNotifSetting(notifCheckInput: Boolean){
+        //TODO: Make this actually change notif settings on phone
+        _uiState.update{
+                currentState -> currentState.copy(
+            enableNotifs =  notifCheckInput
+        )
+        }
+    }
+
+    fun updateDarkModeSetting(darkModeInput: Boolean){
+        //TODO: Make this set dark mode on/off
+        _uiState.update{
+                currentState -> currentState.copy(
+            darkMode =  darkModeInput
+        )
+        }
+    }
+
     //Top bar funcs
 
     //Used to map nav host title to the displayed title
