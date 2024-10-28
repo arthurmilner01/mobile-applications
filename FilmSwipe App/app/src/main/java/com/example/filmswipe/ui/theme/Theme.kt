@@ -15,7 +15,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.navigation.NavController
 import com.example.filmswipe.R
+import com.example.filmswipe.model.AppViewModel
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF3b068f),
@@ -46,7 +48,9 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun FilmSwipeTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean,
+    navController: NavController,
+    appViewModel: AppViewModel,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit

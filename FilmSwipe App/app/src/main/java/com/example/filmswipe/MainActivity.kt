@@ -82,10 +82,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            FilmSwipeTheme {
-                val navController = rememberNavController()
-                val appViewModel: AppViewModel = viewModel()
+            val navController = rememberNavController()
+            val appViewModel: AppViewModel = viewModel()
+            val appUiState by appViewModel.uiState.collectAsState()
 
+            FilmSwipeTheme(appUiState.darkMode, navController,appViewModel){
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = { TopNavigationBar(navController, appViewModel)},
                     bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
@@ -352,13 +353,21 @@ fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel
 @Preview(showBackground = true)
 @Composable
 fun AppPreview() {
-    FilmSwipeTheme {
-        val navController = rememberNavController()
-        val appViewModel: AppViewModel = viewModel()
+    val navController = rememberNavController()
+    val appViewModel: AppViewModel = viewModel()
+    val appUiState by appViewModel.uiState.collectAsState()
 
+    FilmSwipeTheme(appUiState.darkMode, navController,appViewModel){
         Scaffold(modifier = Modifier.fillMaxSize(),
+            topBar = { TopNavigationBar(navController, appViewModel)},
             bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
-            AppNavigator(modifier = Modifier.padding(innerPadding), navController, appViewModel)
+            Box(modifier=Modifier.padding(innerPadding)) {
+                AppNavigator(
+                    modifier = Modifier.padding(8.dp),
+                    navController = navController,
+                    appViewModel = appViewModel
+                )
+            }
         }
     }
 }
