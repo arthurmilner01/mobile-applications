@@ -318,6 +318,19 @@ fun SettingsScreen(navController:NavController,appViewModel:AppViewModel, modifi
                 style=MaterialTheme.typography.labelLarge)
         }
 
+        HorizontalDivider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+
+        Row(modifier=Modifier
+            .padding(5.dp)
+            .fillMaxWidth()
+            .clickable {  }, //TODO: Make functional (passing activity context by view model??)
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            Text(text = "Quit Application",
+                modifier = modifier,
+                style=MaterialTheme.typography.labelLarge)
+        }
+
     }
 }
 
