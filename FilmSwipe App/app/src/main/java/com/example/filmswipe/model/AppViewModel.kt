@@ -71,12 +71,6 @@ class AppViewModel: ViewModel() {
         }
     }
 
-    fun navGoBack(navController: NavController){
-        navController.navigateUp()
-        getScreenTitle(navController)
-        changeNavSelectedItem(_uiState.value.navSelectedItem)
-    }
-
     //Bottom bar funcs
     fun changeNavSelectedItem(index:Int){
         _uiState.update{
