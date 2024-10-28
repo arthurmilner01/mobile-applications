@@ -30,7 +30,7 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel, modifi
     val appUiState by appViewModel.uiState.collectAsState()
     val loginImage = painterResource(R.drawable.filmswipelogo)
 
-    LaunchedEffect(appUiState.isLoggedIn) {
+    LaunchedEffect(appUiState.isLoggedIn, appUiState.isSignedUp) {
         if(appUiState.isSignedUp) {
             appViewModel.newSignUp()
         }
