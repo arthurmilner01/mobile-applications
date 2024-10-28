@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,7 +51,32 @@ class AppViewModel: ViewModel() {
         }
     }
 
-    //Nav bar funcs
+    //Top bar funcs
+
+    //Used to map nav host title to the displayed title
+    private val screenTitles = mapOf(
+        "homescreen" to "Home",
+        "profilescreen" to "Profile",
+        "settingsscreen" to "Settings",
+        "loginscreen" to "Login"
+    )
+
+    fun getScreenTitle(navController: NavController){
+        val currentScreen = navController.currentBackStackEntry?.destination?.route
+        _uiState.update{
+            currentState -> currentState.copy(
+            navScreenTitle =  screenTitles[currentScreen] ?: " " //Empty title if no title
+        )
+        }
+    }
+
+    fun navGoBack(navController: NavController){
+        navController.navigateUp()
+        getScreenTitle(navController)
+        changeNavSelectedItem(_uiState.value.navSelectedItem)
+    }
+
+    //Bottom bar funcs
     fun changeNavSelectedItem(index:Int){
         _uiState.update{
             currentState -> currentState.copy(

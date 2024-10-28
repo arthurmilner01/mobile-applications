@@ -42,6 +42,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
@@ -51,11 +53,16 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
@@ -63,6 +70,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.android.gms.wallet.button.ButtonConstants
 
 class MainActivity : ComponentActivity() {
@@ -75,6 +83,7 @@ class MainActivity : ComponentActivity() {
                 val appViewModel: AppViewModel = viewModel()
 
                 Scaffold(modifier = Modifier.fillMaxSize(),
+                    topBar = { TopNavigationBar(navController, appViewModel)},
                     bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
                     AppNavigator(modifier = Modifier.padding(innerPadding),
                         navController= navController,
@@ -203,7 +212,7 @@ fun ProfileScreen(navController:NavController,appViewModel:AppViewModel, modifie
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        Image(painter=defaultProfilePic,
+        Image(painter=defaultProfilePic, //TODO: IF Statement checking if logged user has pfp
             contentDescription = "App Logo",
             contentScale = ContentScale.Crop,
             modifier= Modifier
@@ -250,6 +259,24 @@ fun SettingsScreen(navController:NavController,appViewModel:AppViewModel, modifi
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
+    val appUiState by appViewModel.uiState.collectAsState()
+
+
+
+    if(appUiState.isLoggedIn){
+        appViewModel.getScreenTitle(navController)
+        TopAppBar(
+            title = { Text(appUiState.navScreenTitle) },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        )
+    }
+}
+
 @Composable
 fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel){
     val appUiState by appViewModel.uiState.collectAsState()
@@ -259,8 +286,7 @@ fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel
 
     if(appUiState.isLoggedIn){
         NavigationBar(
-            modifier=Modifier
-            .background(MaterialTheme.colorScheme.onBackground)
+            containerColor = MaterialTheme.colorScheme.surface
         ){
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
