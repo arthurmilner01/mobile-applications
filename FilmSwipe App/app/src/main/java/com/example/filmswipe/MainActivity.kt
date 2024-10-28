@@ -85,9 +85,13 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = { TopNavigationBar(navController, appViewModel)},
                     bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
-                    AppNavigator(modifier = Modifier.padding(innerPadding),
-                        navController= navController,
-                        appViewModel=appViewModel)
+                    Box(modifier=Modifier.padding(innerPadding)) {
+                        AppNavigator(
+                            modifier = Modifier.padding(8.dp),
+                            navController = navController,
+                            appViewModel = appViewModel
+                        )
+                    }
                 }
             }
         }
@@ -182,6 +186,7 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
             Text(
                 "Sign-Up",
                 style=MaterialTheme.typography.bodyMedium)
+            //TODO: Add sign-up functionality
         }
     }
 }
@@ -228,7 +233,7 @@ fun ProfileScreen(navController:NavController,appViewModel:AppViewModel, modifie
         Text(
             text = stringResource(R.string.profile_name, appUiState.loggedInUsername),
             modifier = modifier
-                .padding(bottom = 48.dp),
+                .padding(bottom = 12.dp),
             style= MaterialTheme.typography.titleLarge
         )
 
@@ -236,8 +241,10 @@ fun ProfileScreen(navController:NavController,appViewModel:AppViewModel, modifie
             text = stringResource(R.string.profile_watchlist),
             modifier = modifier
                 .padding(8.dp),
-            style= MaterialTheme.typography.labelLarge
+            style= MaterialTheme.typography.titleSmall
         )
+
+        //TODO: Add list of watch listed films here
 
     }
 }

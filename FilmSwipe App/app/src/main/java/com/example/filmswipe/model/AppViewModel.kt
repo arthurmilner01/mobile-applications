@@ -19,6 +19,7 @@ class AppViewModel: ViewModel() {
     var passwordInput by mutableStateOf("")
 
     fun checkLoginDetails(){
+        //TODO: Use database for validation
         if((emailInput.equals("arthur@email.com", ignoreCase=true)) && (passwordInput == "password")){
             userLogsIn(emailInput=emailInput)
         }
