@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.filmswipe.model.AppViewModel
 import com.example.filmswipe.ui.theme.FilmSwipeTheme
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -55,6 +57,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.TextField
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -87,7 +90,7 @@ fun AppNavigator(modifier:Modifier = Modifier, navController: NavController, app
     NavHost(
         navController = navController as NavHostController,
         startDestination = "loginscreen",
-        modifier=modifier
+        modifier= modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize())
     {
@@ -117,11 +120,13 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
     {
         Image(painter=loginImage,
             contentDescription = "App Logo",
-            modifier=Modifier
-                .padding(top=10.dp,
-                    bottom=10.dp,
-                    start=25.dp,
-                    end=25.dp)
+            modifier= Modifier
+                .padding(
+                    top = 10.dp,
+                    bottom = 10.dp,
+                    start = 25.dp,
+                    end = 25.dp
+                )
                 .size(200.dp)
         )
 
@@ -144,7 +149,7 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
                 .padding(10.dp)
         )
         Button(
-            onClick = { appViewModel.checkLoginDetails() }, modifier=Modifier
+            onClick = { appViewModel.checkLoginDetails() }, modifier= Modifier
                 .padding(10.dp)
                 .size(width = 200.dp, height = 50.dp),
             colors = ButtonDefaults.buttonColors(
@@ -158,7 +163,7 @@ fun LoginScreen(navController:NavController, appViewModel:AppViewModel, modifier
         }
         Button(
             onClick = {},
-            modifier=Modifier
+            modifier= Modifier
                 .padding(10.dp)
                 .size(width = 200.dp, height = 50.dp),
             colors = ButtonDefaults.buttonColors(
@@ -191,17 +196,40 @@ fun HomeScreen(navController:NavController, appViewModel:AppViewModel, modifier:
 @Composable
 fun ProfileScreen(navController:NavController,appViewModel:AppViewModel, modifier: Modifier=Modifier){
     val appUiState by appViewModel.uiState.collectAsState()
+    val defaultProfilePic = painterResource(R.drawable.defaultprofilepic)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "Profile!",
-            modifier = modifier,
-            style= MaterialTheme.typography.headlineMedium
+        Image(painter=defaultProfilePic,
+            contentDescription = "App Logo",
+            contentScale = ContentScale.Crop,
+            modifier= Modifier
+                .padding(4.dp)
+                .size(120.dp)
+                .clip(CircleShape)
+                .border(
+                    BorderStroke(4.dp, MaterialTheme.colorScheme.onBackground),
+                    CircleShape
+                )
+
         )
+        Text(
+            text = stringResource(R.string.profile_name, appUiState.loggedInUsername),
+            modifier = modifier
+                .padding(bottom = 48.dp),
+            style= MaterialTheme.typography.titleLarge
+        )
+
+        Text(
+            text = stringResource(R.string.profile_watchlist),
+            modifier = modifier
+                .padding(8.dp),
+            style= MaterialTheme.typography.labelLarge
+        )
+
     }
 }
 

@@ -44,6 +44,7 @@ class AppViewModel: ViewModel() {
             currentState -> currentState.copy(
                 isLoggedIn = true,
                 loggedInEmail = emailInput,
+                loggedInUsername = "tempusername", //TODO: Use username when implemented
                 incorrectLogin = false
         )
         }

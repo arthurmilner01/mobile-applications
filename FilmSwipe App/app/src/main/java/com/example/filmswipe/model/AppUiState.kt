@@ -4,5 +4,6 @@ data class AppUiState(
     val incorrectLogin:Boolean = false,
     val isLoggedIn:Boolean = false,
     val loggedInEmail:String = "",
+    val loggedInUsername:String = "",
     val navSelectedItem:Int = 0
 )

@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">FilmSwipe</string>
     <string name="login_email">Currently Logged In: %s</string>
+    <string name="profile_name">%s</string>
+    <string name="profile_watchlist">Watchlist:</string>
 </resources>
