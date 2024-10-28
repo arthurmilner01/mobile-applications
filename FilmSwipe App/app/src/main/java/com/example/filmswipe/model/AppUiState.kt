@@ -5,6 +5,8 @@ data class AppUiState(
     val isLoggedIn:Boolean = false,
     val loggedInEmail:String = "",
     val loggedInUsername:String = "",
+    val incorrectSignUp:Boolean = false,
+    val isSignedUp:Boolean = false,
     val navSelectedItem:Int = 0,
     val navScreenTitle:String = "",
     val enableNotifs:Boolean = true,

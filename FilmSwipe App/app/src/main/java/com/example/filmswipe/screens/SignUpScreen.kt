@@ -26,16 +26,12 @@ import com.example.filmswipe.R
 import com.example.filmswipe.model.AppViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
+fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     val appUiState by appViewModel.uiState.collectAsState()
-    val loginImage = painterResource(R.drawable.filmswipelogo)
 
-    LaunchedEffect(appUiState.isLoggedIn) {
-        if(appUiState.isSignedUp) {
-            appViewModel.newSignUp()
-        }
-        if (appUiState.isLoggedIn) {
-            navController.navigate("homescreen")
+    LaunchedEffect(appUiState.isSignedUp) {
+        if (appUiState.isSignedUp) {
+            navController.navigate("loginscreen")
         }
     }
 
@@ -45,32 +41,36 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel, modifi
         modifier = Modifier
     )
     {
-        Image(painter=loginImage,
-            contentDescription = "App Logo",
-            modifier= Modifier
-                .padding(
-                    top = 10.dp,
-                    bottom = 10.dp,
-                    start = 25.dp,
-                    end = 25.dp
-                )
-                .size(200.dp)
+        Text("Sign-Up",
+            style = MaterialTheme.typography.titleLarge
         )
 
         OutlinedTextField(
-            value = appViewModel.emailInput,
-            onValueChange = { appViewModel.updateEmailInput(it) },
-            isError = appUiState.incorrectLogin,
+            value = appViewModel.signUpEmailInput,
+            onValueChange = { appViewModel.updateSignUpEmailInput(it) },
+            isError = appUiState.incorrectSignUp,
             label = { Text("Email",
                 color = MaterialTheme.colorScheme.onBackground) },
             modifier = Modifier
                 .padding(10.dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
+
         OutlinedTextField(
-            value = appViewModel.passwordInput,
-            onValueChange = { appViewModel.updatePasswordInput(it) },
-            isError = appUiState.incorrectLogin,
+            value = appViewModel.signUpUsernameInput,
+            onValueChange = { appViewModel.updateSignUpUsernameInput(it) },
+            isError = appUiState.incorrectSignUp,
+            label = { Text("Username",
+                color = MaterialTheme.colorScheme.onBackground)
+            },
+            modifier = Modifier
+                .padding(10.dp)
+        )
+
+        OutlinedTextField(
+            value = appViewModel.signUpPasswordInput,
+            onValueChange = { appViewModel.updateSignUpPasswordInput(it) },
+            isError = appUiState.incorrectSignUp,
             label = { Text("Password",
                 color = MaterialTheme.colorScheme.onBackground)
             },
@@ -79,22 +79,9 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel, modifi
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+
         Button(
-            onClick = { appViewModel.checkLoginDetails() }, modifier= Modifier
-                .padding(10.dp)
-                .size(width = 200.dp, height = 50.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary)
-        )
-        {
-            Text(
-                "Login",
-                style= MaterialTheme.typography.bodyMedium
-            )
-        }
-        Button(
-            onClick = { navController.navigate("signupscreen")},
-            modifier= Modifier
+            onClick = { appViewModel.checkSignUpDetails() }, modifier= Modifier
                 .padding(10.dp)
                 .size(width = 200.dp, height = 50.dp),
             colors = ButtonDefaults.buttonColors(
@@ -103,8 +90,8 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel, modifi
         {
             Text(
                 "Sign-Up",
-                style= MaterialTheme.typography.bodyMedium)
-            //TODO: Add sign-up functionality
+                style= MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

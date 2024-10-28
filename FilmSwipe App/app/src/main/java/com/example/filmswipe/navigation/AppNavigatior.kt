@@ -14,6 +14,7 @@ import com.example.filmswipe.screens.HomeScreen
 import com.example.filmswipe.screens.LoginScreen
 import com.example.filmswipe.screens.ProfileScreen
 import com.example.filmswipe.screens.SettingsScreen
+import com.example.filmswipe.screens.SignUpScreen
 
 @Composable
 fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, appViewModel: AppViewModel){
@@ -25,6 +26,7 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
             .fillMaxSize())
     {
         composable("loginscreen") { LoginScreen(navController, appViewModel, modifier) }
+        composable("signupscreen") { SignUpScreen(navController, appViewModel, modifier) }
         composable("homescreen") { HomeScreen(navController, appViewModel, modifier) }
         composable("profilescreen") { ProfileScreen(navController, appViewModel, modifier) }
         composable("settingsscreen") { SettingsScreen(navController, appViewModel, modifier) }

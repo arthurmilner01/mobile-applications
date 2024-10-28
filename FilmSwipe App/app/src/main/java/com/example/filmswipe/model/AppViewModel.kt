@@ -15,8 +15,22 @@ class AppViewModel: ViewModel() {
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
 
     //User input
+    //Log In
     var emailInput by mutableStateOf("")
     var passwordInput by mutableStateOf("")
+    //Sign Up
+    var signUpEmailInput by mutableStateOf("")
+    var signUpUsernameInput by mutableStateOf("")
+    var signUpPasswordInput by mutableStateOf("")
+
+    //Log In funcs
+    fun updateEmailInput(currentEmailInput:String){
+        emailInput = currentEmailInput
+    }
+
+    fun updatePasswordInput(currentPasswordInput:String){
+        passwordInput = currentPasswordInput
+    }
 
     fun checkLoginDetails(){
         //TODO: Use database for validation
@@ -25,20 +39,12 @@ class AppViewModel: ViewModel() {
         }
         else{
             _uiState.update{
-                currentState -> currentState.copy(
-                    incorrectLogin = true,
-                    isLoggedIn = false
+                    currentState -> currentState.copy(
+                incorrectLogin = true,
+                isLoggedIn = false
             )
             }
         }
-    }
-
-    fun updateEmailInput(currentEmailInput:String){
-        emailInput = currentEmailInput
-    }
-
-    fun updatePasswordInput(currentPasswordInput:String){
-        passwordInput = currentPasswordInput
     }
 
     fun userLogsOut(){
@@ -48,6 +54,14 @@ class AppViewModel: ViewModel() {
             loggedInEmail = "",
             loggedInUsername = "",
             incorrectLogin = false
+        )
+        }
+    }
+
+    fun newSignUp(){
+        _uiState.update{
+                currentState -> currentState.copy(
+            isSignedUp = false
         )
         }
     }
@@ -63,6 +77,54 @@ class AppViewModel: ViewModel() {
         }
         emailInput = ""
         passwordInput = ""
+    }
+
+    //Sign Up funcs
+    fun updateSignUpEmailInput(currentEmailInput:String){
+        signUpEmailInput = currentEmailInput
+    }
+
+    fun updateSignUpPasswordInput(currentPasswordInput:String){
+        signUpPasswordInput = currentPasswordInput
+    }
+
+    fun updateSignUpUsernameInput(currentUsernameInput:String){
+        signUpUsernameInput = currentUsernameInput
+    }
+
+    fun checkSignUpDetails(){
+        if(true) { //TODO: Database validation if user doesn't exist
+            _uiState.update { currentState ->
+                currentState.copy(
+                    incorrectSignUp = false
+                )
+            }
+            userSignsUp()
+        }
+        else{
+            _uiState.update { currentState ->
+                currentState.copy(
+                    incorrectSignUp = true
+                )
+            }
+        }
+    }
+
+    private fun userSignsUp(){
+        //TODO: Add user to database
+
+        signUpEmailInput = ""
+        signUpPasswordInput = ""
+        signUpUsernameInput = ""
+        emailInput = ""
+        passwordInput = ""
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                incorrectSignUp = false,
+                isSignedUp = true
+            )
+        }
     }
 
     //Settings page funcs
