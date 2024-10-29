@@ -22,6 +22,9 @@ class AppViewModel: ViewModel() {
     var signUpEmailInput by mutableStateOf("")
     var signUpUsernameInput by mutableStateOf("")
     var signUpPasswordInput by mutableStateOf("")
+    // Search
+    var searchText by mutableStateOf("")
+
 
     //Log In funcs
     fun updateEmailInput(currentEmailInput:String){
@@ -154,7 +157,8 @@ class AppViewModel: ViewModel() {
         "homescreen" to "Home",
         "profilescreen" to "Profile",
         "settingsscreen" to "Settings",
-        "loginscreen" to "Login"
+        "loginscreen" to "Login",
+        "searchscreen" to "Search"
     )
 
     fun getScreenTitle(navController: NavController){
@@ -172,6 +176,18 @@ class AppViewModel: ViewModel() {
             currentState -> currentState.copy(
                 navSelectedItem = index
         )}
+    }
+
+
+    //Search Funcs
+    fun updateSearchQuery(newSearchText:String){
+        searchText = newSearchText
+    }
+
+
+    fun performSearch() {
+        val currentQuery = searchText
+        //TODO: Get Film Data from api using query
     }
 
 }

@@ -13,6 +13,7 @@ import com.example.filmswipe.model.AppViewModel
 import com.example.filmswipe.screens.HomeScreen
 import com.example.filmswipe.screens.LoginScreen
 import com.example.filmswipe.screens.ProfileScreen
+import com.example.filmswipe.screens.SearchScreen
 import com.example.filmswipe.screens.SettingsScreen
 import com.example.filmswipe.screens.SignUpScreen
 
@@ -30,5 +31,6 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
         composable("homescreen") { HomeScreen(navController, appViewModel, modifier) }
         composable("profilescreen") { ProfileScreen(navController, appViewModel, modifier) }
         composable("settingsscreen") { SettingsScreen(navController, appViewModel, modifier) }
+        composable("searchscreen") { SearchScreen(navController, appViewModel) } // New Search screen
     }
 }
