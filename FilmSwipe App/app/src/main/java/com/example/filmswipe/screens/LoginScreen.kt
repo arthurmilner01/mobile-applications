@@ -75,7 +75,7 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel, modifi
         Text(
             text = "Login",
             style = MaterialTheme.typography.displayMedium.copy(
-                fontSize = 26.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
             ),
             modifier = Modifier
