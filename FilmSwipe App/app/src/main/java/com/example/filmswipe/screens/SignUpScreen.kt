@@ -92,7 +92,7 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
                 color = MaterialTheme.colorScheme.onBackground) },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email Icon") },
             modifier = Modifier
-                .padding(8.dp)
+                .padding(bottom = 8.dp)
                 .fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
@@ -106,7 +106,7 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
             },
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Username Icon") },
             modifier = Modifier
-                .padding(8.dp)
+                .padding(bottom = 8.dp)
                 .fillMaxWidth(),
         )
 
@@ -119,7 +119,7 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
             },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Lock Icon") },
             modifier = Modifier
-                .padding(8.dp)
+                .padding(bottom = 8.dp)
                 .fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
