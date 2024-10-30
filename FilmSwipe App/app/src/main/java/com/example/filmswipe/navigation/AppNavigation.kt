@@ -24,13 +24,14 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
         startDestination = "loginscreen",
         modifier= modifier
             .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize())
+            .fillMaxSize()
+    )
     {
         composable("loginscreen") { LoginScreen(navController, appViewModel, modifier) }
         composable("signupscreen") { SignUpScreen(navController, appViewModel, modifier) }
         composable("homescreen") { HomeScreen(navController, appViewModel, modifier) }
         composable("profilescreen") { ProfileScreen(navController, appViewModel, modifier) }
         composable("settingsscreen") { SettingsScreen(navController, appViewModel, modifier) }
-        composable("searchscreen") { SearchScreen(navController, appViewModel) } // New Search screen
+        composable("searchscreen") { SearchScreen(navController, appViewModel, modifier) }
     }
 }
