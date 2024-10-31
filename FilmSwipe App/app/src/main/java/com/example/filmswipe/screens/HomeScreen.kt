@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
@@ -74,8 +75,9 @@ fun SwipableCard(
     var isSwiping by remember { mutableStateOf(false) }
     val swipeThreshold = 150f
 
-    val borderColor = if (isSwiping) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface
     val rotationAngle = offsetX * 0.02f
+    val cardAlpha = if(isSwiping) 1f - ((abs(offsetX) / (swipeThreshold*2))) else 1f
+    val borderColor = if (isSwiping) MaterialTheme.colorScheme.tertiary.copy(alpha=cardAlpha) else MaterialTheme.colorScheme.surface
 
     Card(
         modifier = Modifier
@@ -83,13 +85,14 @@ fun SwipableCard(
             .rotate(rotationAngle)
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .offset(x = offsetX.dp),
+            .offset(x = offsetX.dp)
+            .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))
+            .alpha(cardAlpha),
         shape = RoundedCornerShape(8.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))
                 .clip(RoundedCornerShape(8.dp))
                 .pointerInput(Unit) {
                     detectDragGestures(
