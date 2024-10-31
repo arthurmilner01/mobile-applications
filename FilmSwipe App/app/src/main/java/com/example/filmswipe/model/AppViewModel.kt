@@ -130,6 +130,9 @@ class AppViewModel: ViewModel() {
         }
     }
 
+    //Home page funcs
+
+
     //Settings page funcs
 
     fun updateNotifSetting(notifCheckInput: Boolean){
