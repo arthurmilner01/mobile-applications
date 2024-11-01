@@ -26,11 +26,12 @@ import com.example.filmswipe.model.AppViewModel
 fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier){
     val appUiState by appViewModel.uiState.collectAsState()
 
-    LaunchedEffect(!appUiState.isLoggedIn) {
+    LaunchedEffect(Unit) {
         if (!appUiState.isLoggedIn) {
             appViewModel.changeNavSelectedItem(0)
             navController.navigate("loginscreen")
         }
+        appViewModel.getScreenTitle(navController)
     }
 
     Column(

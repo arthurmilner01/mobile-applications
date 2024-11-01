@@ -18,4 +18,11 @@ data class AppUiState(
     //Notifications
     val enableNotifs:Boolean = true,
     val darkMode:Boolean = false,
+
+    //Home
+    val currentMovieTitle:String = "",
+    val currentMovieOverview:String = "",
+    val currentMoviePosterPath:String? = "",
+    val viewingMovieDetails:Boolean = false
+
 )

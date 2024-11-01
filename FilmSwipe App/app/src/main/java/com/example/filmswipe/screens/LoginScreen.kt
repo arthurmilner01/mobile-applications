@@ -58,7 +58,7 @@ fun LoginScreen(navController: NavController, appViewModel: AppViewModel, modifi
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
     )
     {
         Image(painter=loginImage,

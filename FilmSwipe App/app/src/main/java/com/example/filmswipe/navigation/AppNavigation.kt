@@ -10,12 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.filmswipe.model.AppViewModel
-import com.example.filmswipe.screens.HomeScreen
-import com.example.filmswipe.screens.LoginScreen
-import com.example.filmswipe.screens.ProfileScreen
-import com.example.filmswipe.screens.SearchScreen
-import com.example.filmswipe.screens.SettingsScreen
-import com.example.filmswipe.screens.SignUpScreen
+import com.example.filmswipe.screens.*
 
 @Composable
 fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, appViewModel: AppViewModel){
@@ -33,5 +28,6 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
         composable("profilescreen") { ProfileScreen(navController, appViewModel, modifier) }
         composable("settingsscreen") { SettingsScreen(navController, appViewModel, modifier) }
         composable("searchscreen") { SearchScreen(navController, appViewModel, modifier) }
+        composable("moviedetailsscreen") { MovieDetailsScreen(navController, appViewModel, modifier)}
     }
 }

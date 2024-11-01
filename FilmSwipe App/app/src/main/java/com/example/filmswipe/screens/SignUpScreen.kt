@@ -46,7 +46,7 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
     val loginImage = painterResource(R.drawable.filmswipelogo)
 
 
-    LaunchedEffect(appUiState.isSignedUp) {
+    LaunchedEffect(Unit) {
         if (appUiState.isSignedUp) {
             navController.navigate("loginscreen")
         }

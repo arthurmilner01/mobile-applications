@@ -57,8 +57,6 @@ class AppViewModel: ViewModel() {
         }
     }
 
-
-
     fun removeMovie(index: Int) {
         val currentList = _movies.value?.toMutableList() ?: return
         if (index in currentList.indices) {
@@ -194,6 +192,16 @@ class AppViewModel: ViewModel() {
 
     //Home page funcs
 
+    //Stores current movie to swipe details
+    fun getCurrentMovie(movieTitle:String, movieOverview:String, moviePosterPath:String?){
+        _uiState.update{
+                currentState -> currentState.copy(
+                    currentMovieTitle =  movieTitle,
+                    currentMovieOverview = movieOverview,
+                    currentMoviePosterPath = moviePosterPath
+        )
+        }
+    }
 
     //Settings page funcs
 
@@ -223,7 +231,8 @@ class AppViewModel: ViewModel() {
         "profilescreen" to "Profile",
         "settingsscreen" to "Settings",
         "loginscreen" to "Login",
-        "searchscreen" to "Search"
+        "searchscreen" to "Search",
+        "moviedetailsscreen" to ""
     )
 
     fun getScreenTitle(navController: NavController){
@@ -232,6 +241,21 @@ class AppViewModel: ViewModel() {
             currentState -> currentState.copy(
             navScreenTitle =  screenTitles[currentScreen] ?: " " //Empty title if no title
         )
+        }
+        if(screenTitles[currentScreen] == ""){
+            _uiState.update{
+                    currentState -> currentState.copy(
+                viewingMovieDetails =  true
+            )
+            }
+        }
+        else
+        {
+            _uiState.update{
+                    currentState -> currentState.copy(
+                viewingMovieDetails =  false
+            )
+            }
         }
     }
 

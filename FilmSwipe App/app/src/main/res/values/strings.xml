@@ -3,4 +3,6 @@
     <string name="login_email">Currently Logged In: %s</string>
     <string name="profile_name">%s</string>
     <string name="profile_watchlist">Watchlist:</string>
+    <string name="movie_details_title">%s</string>
+    <string name="movie_details_overview">%s</string>
 </resources>

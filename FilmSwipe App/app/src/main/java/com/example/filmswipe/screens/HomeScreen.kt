@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,8 +36,11 @@ import kotlin.math.abs
 @Composable
 fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     LaunchedEffect(Unit){
+        appViewModel.getScreenTitle(navController)
         appViewModel.fetchPopularMovies()
     }
+    val appUiState by appViewModel.uiState.collectAsState()
+
 
     val movies by appViewModel.movies.observeAsState(emptyList())
     val loading by appViewModel.loading.observeAsState(initial = false)
@@ -44,7 +48,8 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
 
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -52,20 +57,24 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
             CircularProgressIndicator() //Loading icon if API not yet responded
         }
         else if(error != null){ //If error in loading films display this
-            Text(text="Error loading movies please try again.")
-            Button(onClick = { appViewModel.fetchPopularMovies() }) {
-                Text(text = "Reload")
+            Column {
+                Text(text = "Error loading movies please try again.")
+                Button(onClick = { appViewModel.fetchPopularMovies() }) {
+                    Text(text = "Reload")
+                }
             }
         }
         else{ //If API call is successful
             for (index in movies.indices.reversed()) {
                 SwipableCard(
+                    navController = navController,
                     title = movies[index].title,
                     subtitle = movies[index].overview,
                     filmImage = movies[index].poster_path,
                     onSwipeLeft = { appViewModel.removeMovie(index) },
                     onSwipeRight = { appViewModel.removeLikedMovie(index) },
                 )
+                appViewModel.getCurrentMovie(movies[index].title, movies[index].overview, movies[index].poster_path)
             }
         }
     }
@@ -73,6 +82,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
 
 @Composable
 fun SwipableCard(
+    navController: NavController,
     title: String,
     subtitle: String,
     filmImage: String?,
@@ -92,7 +102,8 @@ fun SwipableCard(
             .fillMaxSize()
             .offset(x = offsetX.dp)
             .rotate(rotationAngle)  // Rotate the entire Box, including the border
-            .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))  //
+            .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))
+            .clickable { navController.navigate("moviedetailsscreen") }
     ){
         Card(
             modifier = Modifier

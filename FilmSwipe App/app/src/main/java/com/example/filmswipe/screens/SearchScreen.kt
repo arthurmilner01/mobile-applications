@@ -15,6 +15,10 @@ import com.example.filmswipe.model.AppViewModel
 
 @Composable
 fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
+    LaunchedEffect(Unit){
+        appViewModel.getScreenTitle(navController)
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
