@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.filmswipe.R
 import com.example.filmswipe.model.AppViewModel
@@ -124,7 +125,7 @@ fun SwipableCard(
         ) {
             val imageUrl = "https://image.tmdb.org/t/p/w500${filmImage ?: ""}"
             Image(
-                painter = rememberImagePainter(imageUrl),
+                painter = rememberAsyncImagePainter(imageUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize(),
