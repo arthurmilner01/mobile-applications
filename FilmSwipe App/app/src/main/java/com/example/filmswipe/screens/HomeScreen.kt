@@ -85,7 +85,6 @@ fun SwipableCard(
     Card(
         modifier = Modifier
             .padding(24.dp)
-            .rotate(rotationAngle)
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .offset(x = offsetX.dp)
@@ -128,7 +127,8 @@ fun SwipableCard(
                 painter = rememberAsyncImagePainter(imageUrl),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .rotate(rotationAngle),
                 contentScale = ContentScale.Crop
             )
 
@@ -137,6 +137,7 @@ fun SwipableCard(
                     .align(Alignment.BottomStart)
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
                     .fillMaxWidth()
+                    .rotate(rotationAngle)
             ) {
                 Text(
                     text = title,
