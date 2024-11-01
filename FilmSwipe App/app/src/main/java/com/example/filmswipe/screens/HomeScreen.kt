@@ -8,9 +8,11 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -22,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.filmswipe.R
 import com.example.filmswipe.model.AppViewModel
 import com.example.filmswipe.model.Film
@@ -29,26 +32,35 @@ import kotlin.math.abs
 
 @Composable
 fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
-    val films = remember {
-        mutableStateListOf(
-            Film("Inception", "A mind-bending thriller", R.drawable.defaultprofilepic),
-            Film("The Matrix", "A sci-fi classic", R.drawable.defaultprofilepic),
-            Film("Interstellar", "A journey through space", R.drawable.defaultprofilepic)
-        )
+    LaunchedEffect(Unit){
+        appViewModel.fetchPopularMovies()
     }
+
+    val movies by appViewModel.movies.observeAsState(emptyList())
+    val loading by appViewModel.loading.observeAsState(initial = false)
+    val error by appViewModel.error.observeAsState(initial = null)
+
 
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        for (index in films.indices.reversed()) {
-            SwipableCard(
-                title = films[index].title,
-                subtitle = films[index].subtitle,
-                filmImage = films[index].image,
-                onSwipeLeft = { films.removeAt(index) },
-                onSwipeRight = { films.removeAt(index) },
-            )
+        if(loading){
+            CircularProgressIndicator()
+        }
+        else if(error != null){
+            Text(text="ERROR")
+        }
+        else{
+            for (index in movies.indices.reversed()) {
+                SwipableCard(
+                    title = movies[index].title,
+                    subtitle = movies[index].overview,
+                    filmImage = movies[index].poster_path,
+                    onSwipeLeft = { appViewModel.removeMovie(index) },
+                    onSwipeRight = { appViewModel.removeLikedMovie(index) },
+                )
+            }
         }
     }
 }
@@ -57,7 +69,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
 fun SwipableCard(
     title: String,
     subtitle: String,
-    filmImage: Int,
+    filmImage: String?,
     onSwipeLeft: () -> Unit = {},
     onSwipeRight: () -> Unit = {}
 ) {
@@ -110,8 +122,9 @@ fun SwipableCard(
                     )
                 }
         ) {
+            val imageUrl = "https://image.tmdb.org/t/p/w500${filmImage ?: ""}"
             Image(
-                painter = painterResource(filmImage),
+                painter = rememberImagePainter(imageUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize(),

@@ -3,16 +3,78 @@ package com.example.filmswipe.model
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.filmswipe.data.*
+import com.example.filmswipe.network.*
+import com.google.android.gms.common.api.Response
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class AppViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(AppUiState())
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
+
+    //API
+    val apiKey = "bee0c37b9c1a2d1c1ecf80b6cce631a5"
+
+    private val _movies = MutableLiveData<List<Movie>>()
+    val movies: LiveData<List<Movie>> get() = _movies
+
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean> get() = _loading
+
+    private val _error = MutableLiveData<String?>()
+    val error: LiveData<String?> get() = _error
+
+
+
+    fun fetchPopularMovies() {
+        _loading.value = true
+        viewModelScope.launch {
+            try {
+                // Call the method from the API service
+                val response = RetrofitInstance.api.getPopularMovies(apiKey)
+
+                if (response.isSuccessful) {
+                    // Safely access the results from the response
+                    _movies.postValue(response.body()?.results ?: emptyList())
+                    _error.postValue(null) // Clear any previous errors
+                } else {
+                    _error.postValue("Error: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                _error.postValue("Exception: ${e.message}")
+            } finally {
+                _loading.postValue(false)
+            }
+        }
+    }
+
+
+
+    fun removeMovie(index: Int) {
+        val currentList = _movies.value?.toMutableList() ?: return
+        if (index in currentList.indices) {
+            currentList.removeAt(index)
+            _movies.value = currentList // Update the LiveData
+        }
+    }
+
+    fun removeLikedMovie(index: Int) {
+        //TODO: Save to watchlist in db before removing
+        val currentList = _movies.value?.toMutableList() ?: return
+        if (index in currentList.indices) {
+            currentList.removeAt(index)
+            _movies.value = currentList // Update the LiveData
+        }
+    }
 
     //User input
     //Log In
