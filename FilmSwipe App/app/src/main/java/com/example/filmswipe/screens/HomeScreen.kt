@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -47,12 +48,15 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
         contentAlignment = Alignment.Center
     ) {
         if(loading){
-            CircularProgressIndicator()
+            CircularProgressIndicator() //Loading icon if API not yet responded
         }
-        else if(error != null){
-            Text(text="ERROR")
+        else if(error != null){ //If error in loading films display this
+            Text(text="Error loading movies please try again.")
+            Button(onClick = { appViewModel.fetchPopularMovies() }) {
+                Text(text = "Reload")
+            }
         }
-        else{
+        else{ //If API call is successful
             for (index in movies.indices.reversed()) {
                 SwipableCard(
                     title = movies[index].title,
