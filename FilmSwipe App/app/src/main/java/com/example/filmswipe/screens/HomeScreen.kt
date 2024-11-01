@@ -44,7 +44,8 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
 
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {
         if(loading){
@@ -86,77 +87,81 @@ fun SwipableCard(
     val cardAlpha = if(isSwiping) 1f - ((abs(offsetX) / (swipeThreshold*2))) else 1f
     val borderColor = if (isSwiping) MaterialTheme.colorScheme.tertiary.copy(alpha=cardAlpha) else MaterialTheme.colorScheme.surface
 
-    Card(
+    Box(
         modifier = Modifier
-            .padding(24.dp)
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
             .offset(x = offsetX.dp)
-            .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))
-            .alpha(cardAlpha),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Box(
+            .rotate(rotationAngle)  // Rotate the entire Box, including the border
+            .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))  //
+    ){
+        Card(
             modifier = Modifier
+                .padding(24.dp)
                 .fillMaxSize()
-                .clip(RoundedCornerShape(8.dp))
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDragStart = {
-                            isSwiping = true
-                        },
-                        onDrag = { change, dragAmount ->
-                            change.consume()
-                            offsetX += dragAmount.x
-                        },
-                        onDragEnd = {
-                            // Check if the swipe exceeds the threshold
-                            if (abs(offsetX) > swipeThreshold) {
-                                if (offsetX < 0) onSwipeLeft() else onSwipeRight()
-                            }
-                            // Reset position and swiping state
-                            offsetX = 0f
-                            isSwiping = false
-                        },
-                        onDragCancel = {
-                            // Reset position and swiping state on cancel
-                            offsetX = 0f
-                            isSwiping = false
-                        }
-                    )
-                }
+                .background(MaterialTheme.colorScheme.background)
+                .alpha(cardAlpha),
+            shape = RoundedCornerShape(8.dp)
         ) {
-            val imageUrl = "https://image.tmdb.org/t/p/w500${filmImage ?: ""}"
-            Image(
-                painter = rememberAsyncImagePainter(imageUrl),
-                contentDescription = null,
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .rotate(rotationAngle),
-                contentScale = ContentScale.Crop
-            )
-
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
-                    .fillMaxWidth()
-                    .rotate(rotationAngle)
+                    .clip(RoundedCornerShape(8.dp))
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDragStart = {
+                                isSwiping = true
+                            },
+                            onDrag = { change, dragAmount ->
+                                change.consume()
+                                offsetX += dragAmount.x
+                            },
+                            onDragEnd = {
+                                // Check if the swipe exceeds the threshold
+                                if (abs(offsetX) > swipeThreshold) {
+                                    if (offsetX < 0) onSwipeLeft() else onSwipeRight()
+                                }
+                                // Reset position and swiping state
+                                offsetX = 0f
+                                isSwiping = false
+                            },
+                            onDragCancel = {
+                                // Reset position and swiping state on cancel
+                                offsetX = 0f
+                                isSwiping = false
+                            }
+                        )
+                    }
             ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
+                val imageUrl = "https://image.tmdb.org/t/p/w500${filmImage ?: ""}"
+                Image(
+                    painter = rememberAsyncImagePainter(imageUrl),
+                    contentDescription = null,
                     modifier = Modifier
-                        .padding(12.dp)
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
+
+                Column(
                     modifier = Modifier
-                        .padding(12.dp)
-                )
+                        .align(Alignment.BottomStart)
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .padding(12.dp)
+                    )
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .padding(12.dp)
+                    )
+                }
             }
         }
     }
