@@ -35,17 +35,17 @@ import kotlin.math.abs
 
 @Composable
 fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
-    LaunchedEffect(Unit){
-        appViewModel.getScreenTitle(navController)
-        appViewModel.fetchPopularMovies()
-    }
     val appUiState by appViewModel.uiState.collectAsState()
-
-
     val movies by appViewModel.movies.observeAsState(emptyList())
     val loading by appViewModel.loading.observeAsState(initial = false)
     val error by appViewModel.error.observeAsState(initial = null)
 
+    LaunchedEffect(Unit){
+        appViewModel.getScreenTitle(navController)
+        if (movies.isEmpty()) {
+            appViewModel.fetchPopularMovies()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -106,6 +106,7 @@ fun SwipableCard(
 
     Box(
         modifier = Modifier
+            .padding(start = 10.dp, end = 10.dp, top = 40.dp, bottom = 40.dp)
             .fillMaxSize()
             .offset(x = offsetX.dp)
             .rotate(rotationAngle)  // Rotate the entire Box, including the border
@@ -114,7 +115,6 @@ fun SwipableCard(
     ){
         Card(
             modifier = Modifier
-                .padding(24.dp)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .alpha(cardAlpha),
