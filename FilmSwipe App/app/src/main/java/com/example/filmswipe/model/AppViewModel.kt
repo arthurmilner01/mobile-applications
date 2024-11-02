@@ -1,6 +1,7 @@
 package com.example.filmswipe.model
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
@@ -54,23 +55,6 @@ class AppViewModel: ViewModel() {
             } finally {
                 _loading.postValue(false)
             }
-        }
-    }
-
-    fun removeMovie(index: Int) {
-        val currentList = _movies.value?.toMutableList() ?: return
-        if (index in currentList.indices) {
-            currentList.removeAt(index)
-            _movies.value = currentList // Update the LiveData
-        }
-    }
-
-    fun removeLikedMovie(index: Int) {
-        //TODO: Save to watchlist in db before removing
-        val currentList = _movies.value?.toMutableList() ?: return
-        if (index in currentList.indices) {
-            currentList.removeAt(index)
-            _movies.value = currentList // Update the LiveData
         }
     }
 
@@ -191,6 +175,23 @@ class AppViewModel: ViewModel() {
     }
 
     //Home page funcs
+    //Swipe left
+    fun removeMovie(index: Int) {
+        val currentList = _movies.value?.toMutableList() ?: return
+        if (index in currentList.indices) {
+            currentList.removeAt(index)
+            _movies.value = currentList // Update the LiveData
+        }
+    }
+    //Swipe right
+    fun removeLikedMovie(index: Int) {
+        //TODO: Save to watchlist in db before removing
+        val currentList = _movies.value?.toMutableList() ?: return
+        if (index in currentList.indices) {
+            currentList.removeAt(index)
+            _movies.value = currentList // Update the LiveData
+        }
+    }
 
     //Stores current movie to swipe details
     fun getCurrentMovie(movieTitle:String, movieOverview:String, moviePosterPath:String?){

@@ -66,13 +66,22 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
         }
         else{ //If API call is successful
             for (index in movies.indices.reversed()) {
+                val isLastMovie = index == movies.size - 1 //Checking if last film
+
                 SwipableCard(
                     navController = navController,
                     title = movies[index].title,
                     subtitle = movies[index].overview,
                     filmImage = movies[index].poster_path,
-                    onSwipeLeft = { appViewModel.removeMovie(index) },
-                    onSwipeRight = { appViewModel.removeLikedMovie(index) },
+                    onSwipeLeft = {
+                        appViewModel.removeMovie(index)
+                        if(isLastMovie) {
+                            appViewModel.fetchPopularMovies()
+                        } },
+                    onSwipeRight = { appViewModel.removeLikedMovie(index)
+                        if(isLastMovie) {
+                            appViewModel.fetchPopularMovies()
+                        } },
                 )
                 appViewModel.getCurrentMovie(movies[index].title, movies[index].overview, movies[index].poster_path)
             }
