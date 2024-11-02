@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
                     Box(modifier=Modifier.padding(innerPadding)) {
                         AppNavigator(
-                            modifier = Modifier.padding(8.dp),
+                            modifier = Modifier,
                             navController = navController,
                             appViewModel = appViewModel
                         )
