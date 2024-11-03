@@ -192,6 +192,15 @@ class AppViewModel: ViewModel() {
             _movies.value = currentList // Update the LiveData
         }
     }
+    //Swipe up
+    fun removeWatchedMovie(index: Int){
+        //TODO: Save as watched movie in db before removing
+        val currentList = _movies.value?.toMutableList() ?: return
+        if (index in currentList.indices) {
+            currentList.removeAt(index)
+            _movies.value = currentList // Update the LiveData
+        }
+    }
 
     //Stores current movie to swipe details
     fun getCurrentMovie(movieTitle:String, movieOverview:String, moviePosterPath:String?){

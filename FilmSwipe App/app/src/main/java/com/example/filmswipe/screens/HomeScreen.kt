@@ -82,6 +82,10 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                         if(isLastMovie) {
                             appViewModel.fetchPopularMovies()
                         } },
+                    onSwipeUp = { appViewModel.removeWatchedMovie(index)
+                    if(isLastMovie){
+                        appViewModel.fetchPopularMovies()
+                    }}
                 )
                 appViewModel.getCurrentMovie(movies[index].title, movies[index].overview, movies[index].poster_path)
             }
@@ -96,9 +100,11 @@ fun SwipableCard(
     subtitle: String,
     filmImage: String?,
     onSwipeLeft: () -> Unit = {},
-    onSwipeRight: () -> Unit = {}
+    onSwipeRight: () -> Unit = {},
+    onSwipeUp: () -> Unit = {}
 ) {
     var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
     var isSwiping by remember { mutableStateOf(false) }
     val swipeThreshold = 150f
 
@@ -108,6 +114,7 @@ fun SwipableCard(
     //Change border color based on swipe direction and intensity
     //OLD: val borderColor = if (isSwiping) MaterialTheme.colorScheme.tertiary.copy(alpha=cardAlpha) else MaterialTheme.colorScheme.surface
     val borderColor = when {
+        offsetY < -swipeThreshold / 2 -> Color.Blue.copy(alpha = cardAlpha) //Up
         offsetX > swipeThreshold / 2 -> Color.Green.copy(alpha = cardAlpha)  //Right
         offsetX < -swipeThreshold / 2 -> Color.Red.copy(alpha = cardAlpha)   //Left
         else -> MaterialTheme.colorScheme.surface                            //Neutral
@@ -117,7 +124,7 @@ fun SwipableCard(
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp, top = 40.dp, bottom = 40.dp)
             .fillMaxSize()
-            .offset(x = offsetX.dp)
+            .offset(x = offsetX.dp, y= offsetY.dp)
             .rotate(rotationAngle)  // Rotate the entire Box, including the border
             .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))
             .clickable { navController.navigate("moviedetailsscreen") }
@@ -141,14 +148,26 @@ fun SwipableCard(
                             onDrag = { change, dragAmount ->
                                 change.consume()
                                 offsetX += dragAmount.x
+
+                                //Allows downswipe but not beyond initial offset.y
+                                val minOffsetY = offsetY + dragAmount.y
+
+                                if (minOffsetY <= 0) {
+                                    offsetY = minOffsetY
+                                }
                             },
                             onDragEnd = {
-                                // Check if the swipe exceeds the threshold
-                                if (abs(offsetX) > swipeThreshold) {
+                                //If card above certain Y always count as swipe up
+                                //Else check offset X for left or right swipe
+                                if(abs(offsetY) > swipeThreshold){
+                                    onSwipeUp()
+                                }
+                                else if(abs(offsetX) > swipeThreshold) {
                                     if (offsetX < 0) onSwipeLeft() else onSwipeRight()
                                 }
                                 // Reset position and swiping state
                                 offsetX = 0f
+                                offsetY = 0f
                                 isSwiping = false
                             },
                             onDragCancel = {
