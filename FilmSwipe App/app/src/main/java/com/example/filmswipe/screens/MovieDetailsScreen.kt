@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -52,15 +55,12 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
     }
 
     val imageUrl = "https://image.tmdb.org/t/p/w500${appUiState.currentMoviePosterPath ?: ""}"
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-    ){
-        Box(modifier = Modifier
-            .weight(1f)){
+    Column(modifier=Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        ) {
 
             //Background/header image
             Image(
@@ -79,18 +79,18 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
             )
 
             Row(
-                horizontalArrangement = Arrangement.SpaceAround,
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(12.dp)
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(imageUrl),
                     contentDescription = null,
                     modifier = Modifier
-                        .height(200.dp)
-                        .width(133.dp)
+                        .height(150.dp)
+                        .width(100.dp)
                         .border(2.dp, MaterialTheme.colorScheme.onBackground)
                         .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop
@@ -106,58 +106,79 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
 
             }
         }
-        Column(
-            modifier = Modifier
-                .weight(2f)
-                .padding(16.dp),
+
+        LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ){
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                text = stringResource(
-                    R.string.movie_details_overview,
-                    appUiState.currentMovieOverview
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(12.dp)
-            )
-            Text(
-                text="Movie Cast",
-                style = MaterialTheme.typography.titleSmall)
-            if (castLoading) {
-                CircularProgressIndicator()
-            } else if (castError != null) {
-                Text(text = "Error loading cast: $castError")
-            } else {
-                LazyColumn(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            item {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
                 ) {
+                    Text(
+                        text = "Overview",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.movie_details_overview,
+                            appUiState.currentMovieOverview
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                    Text(
+                        text = "Cast",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
+
+            when {
+                castLoading -> {
+                    item {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                castError != null -> {
+                    item {
+                        Text(text = "Error loading cast: $castError")
+                    }
+                }
+
+                else -> {
                     items(cast) { castMember ->
                         CastMemberListItem(castMember)
                     }
                 }
             }
         }
-
     }
+
 }
 
 @Composable
 fun CastMemberListItem(castMember: CastMember){
-    //Pre-fix for url of cast pic
+    //Prefix for url of cast pic
     val profileImageUrl = "https://image.tmdb.org/t/p/w200${castMember.profile_path}"
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(8.dp)
+            .padding(start = 12.dp, end=12.dp)
     ){
         Image(
-            painter = rememberAsyncImagePainter(profileImageUrl),
+            painter = if(castMember.profile_path != null)
+            {rememberAsyncImagePainter(profileImageUrl)}
+            else { painterResource(R.drawable.defaultprofilepic) },
             contentDescription = null,
             modifier = Modifier
                 .size(64.dp)
@@ -165,10 +186,11 @@ fun CastMemberListItem(castMember: CastMember){
                 .padding(4.dp),
             contentScale = ContentScale.Crop
         )
+        Spacer(modifier = Modifier.width(8.dp))
         Column {
             Text(
                 text = castMember.name,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
@@ -178,4 +200,9 @@ fun CastMemberListItem(castMember: CastMember){
             )
         }
     }
+    HorizontalDivider(
+        modifier=Modifier
+            .padding(start = 20.dp, end=20.dp),
+        thickness = 1.dp,
+        color = Color.Transparent)
 }
