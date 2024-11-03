@@ -111,7 +111,7 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modif
                     if (searchResults.isEmpty()) {
                         item {
                             Text(
-                                text = "No movies were found.",
+                                text = "Hit search to confirm your input. If this message remains please try a different search term.",
                                 style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.padding(top = 16.dp)
                             )
@@ -148,6 +148,7 @@ fun MovieItem(movie: Movie){
                 .height(100.dp)
                 .width(66.dp)
                 .clip(RoundedCornerShape(8.dp))
+                .padding(end=20.dp)
         )
         Text(text = movie.title, style = MaterialTheme.typography.titleLarge)
     }

@@ -378,6 +378,7 @@ class AppViewModel: ViewModel() {
                 searchingUsers = true
             )}
             searchText = ""
+            _searchResults.postValue(emptyList())
         }
         else{
             _uiState.update{
@@ -385,6 +386,7 @@ class AppViewModel: ViewModel() {
                 searchingUsers = false
             )}
             searchText = ""
+            _searchResults.postValue(emptyList())
         }
     }
 
