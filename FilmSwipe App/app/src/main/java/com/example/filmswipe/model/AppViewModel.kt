@@ -398,5 +398,22 @@ class AppViewModel: ViewModel() {
         }
     }
 
+    //Movie details funcs
+    fun showMovieCrew(){
+        _uiState.update{
+                currentState -> currentState.copy(
+            viewingMovieCrew = true
+        )
+        }
+    }
+
+    fun showMovieCast(){
+        _uiState.update{
+                currentState -> currentState.copy(
+            viewingMovieCrew = false
+        )
+        }
+    }
+
 }
 

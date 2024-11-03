@@ -4,6 +4,7 @@ import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -148,10 +150,29 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(8.dp)
                     )
-                    Text(
-                        text = "Cast",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Cast",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = if(!appUiState.viewingMovieCrew) FontWeight.Bold else FontWeight.Normal
+                            ),
+                            modifier = Modifier
+                                .clickable { appViewModel.showMovieCast() }
+                                .padding(end = 16.dp) // Optional padding for space between items
+                        )
+                        Text(
+                            text = "Crew",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = if(appUiState.viewingMovieCrew) FontWeight.Bold else FontWeight.Normal
+                            ),
+                            modifier = Modifier
+                                .clickable { appViewModel.showMovieCrew() }
+                        )
+                    }
                 }
             }
 
@@ -170,14 +191,16 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
 
                 else -> {
                     //TODO: ADD STATE THAT DISPLAYS EITHER CAST OR CREW
-                    items(cast) { castMember ->
-                        CastMemberListItem(castMember)
+
+                    if(appUiState.viewingMovieCrew){
+                        items(crew) { crewMember ->
+                            CrewMemberListItem(crewMember)
+                        }
                     }
-                    item{
-                        Text("Crew")
-                    }
-                    items(crew) { crewMember ->
-                        CrewMemberListItem(crewMember)
+                    else{
+                        items(cast) { castMember ->
+                            CastMemberListItem(castMember)
+                        }
                     }
                 }
             }

@@ -29,6 +29,9 @@ data class AppUiState(
     //Profile
     val viewingWatchedMovies:Boolean = false,
 
+    //Movie Details
+    val viewingMovieCrew:Boolean = false,
+
     //Search
     val searchingUsers:Boolean = false
 
