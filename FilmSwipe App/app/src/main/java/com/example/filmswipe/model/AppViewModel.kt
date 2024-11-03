@@ -23,6 +23,18 @@ class AppViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(AppUiState())
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
 
+    //User input
+    //Log In
+    var emailInput by mutableStateOf("")
+    var passwordInput by mutableStateOf("")
+    //Sign Up
+    var signUpEmailInput by mutableStateOf("")
+    var signUpUsernameInput by mutableStateOf("")
+    var signUpPasswordInput by mutableStateOf("")
+    // Search
+    var searchText by mutableStateOf("")
+    var searchCheckbox by mutableStateOf(false)
+
     //API
     val apiKey = "bee0c37b9c1a2d1c1ecf80b6cce631a5"
 
@@ -45,6 +57,10 @@ class AppViewModel: ViewModel() {
 
     private val _castError = MutableLiveData<String?>()
     val castError: LiveData<String?> get() = _castError
+
+    //Live data object for searching
+    private val _searchResults = MutableLiveData<List<Movie>>()
+    val searchResults: LiveData<List<Movie>> get() = _searchResults
 
 
 
@@ -92,16 +108,31 @@ class AppViewModel: ViewModel() {
         }
     }
 
-    //User input
-    //Log In
-    var emailInput by mutableStateOf("")
-    var passwordInput by mutableStateOf("")
-    //Sign Up
-    var signUpEmailInput by mutableStateOf("")
-    var signUpUsernameInput by mutableStateOf("")
-    var signUpPasswordInput by mutableStateOf("")
-    // Search
-    var searchText by mutableStateOf("")
+    fun searchMoviesByTitle() {
+        if (searchText.isBlank()) {
+            _searchResults.postValue(emptyList())
+            return
+        }
+
+        _loading.value = true
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.searchMoviesByTitle(apiKey, searchText)
+
+                if (response.isSuccessful) {
+                    _searchResults.postValue(response.body()?.results ?: emptyList())
+                    _error.postValue(null)
+                } else {
+                    _error.postValue("Error: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                _error.postValue("Exception: ${e.message}")
+            } finally {
+                _loading.postValue(false)
+            }
+        }
+    }
+
 
 
     //Log In funcs
@@ -334,10 +365,27 @@ class AppViewModel: ViewModel() {
         searchText = newSearchText
     }
 
-
-    fun performSearch() {
+    fun performUserSearch() {
         val currentQuery = searchText
-        //TODO: Get Film Data from api using query
+        //TODO: Get users
+    }
+
+    //Toggle box changes search type
+    fun changeSearchType(checkBoxValue:Boolean){
+        if(checkBoxValue){
+            _uiState.update{
+                    currentState -> currentState.copy(
+                searchingUsers = true
+            )}
+            searchText = ""
+        }
+        else{
+            _uiState.update{
+                    currentState -> currentState.copy(
+                searchingUsers = false
+            )}
+            searchText = ""
+        }
     }
 
 }

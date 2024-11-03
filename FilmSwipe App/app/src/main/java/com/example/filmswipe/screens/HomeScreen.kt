@@ -31,7 +31,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.filmswipe.R
 import com.example.filmswipe.model.AppViewModel
-import com.example.filmswipe.model.Film
 import kotlin.math.abs
 
 @Composable

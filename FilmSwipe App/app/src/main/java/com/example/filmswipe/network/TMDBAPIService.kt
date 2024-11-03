@@ -19,4 +19,12 @@ interface TMDBAPIService {
         @Query("api_key") apiKey: String,
         @Query("language") language: String = "en-US"
     ): Response<CastResponse>
+
+    @GET("search/movie")
+    suspend fun searchMoviesByTitle(
+        @Query("api_key") apiKey: String,
+        @Query("query") title: String,
+        @Query("page") pageNumber: Int = 1,
+        @Query("language") language: String = "en-US"
+    ): Response<MovieResponse>
 }
