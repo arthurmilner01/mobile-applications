@@ -371,6 +371,7 @@ class AppViewModel: ViewModel() {
     //Search Funcs
     fun updateSearchQuery(newSearchText:String){
         searchText = newSearchText
+        _searchResults.postValue(emptyList())
     }
 
     fun performUserSearch() {
