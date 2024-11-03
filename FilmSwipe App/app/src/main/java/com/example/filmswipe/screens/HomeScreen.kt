@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -189,7 +190,7 @@ fun SwipableCard(
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
                         .fillMaxWidth()
                 ) {
                     Text(
@@ -197,14 +198,16 @@ fun SwipableCard(
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier
-                            .padding(12.dp)
+                            .padding(start=12.dp, end = 12.dp, top= 4.dp, bottom = 4.dp)
                     )
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier
-                            .padding(12.dp)
+                            .padding(start = 12.dp, end=12.dp, bottom =8.dp),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
