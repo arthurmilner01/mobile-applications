@@ -52,11 +52,17 @@ class AppViewModel: ViewModel() {
     private val _cast = MutableLiveData<List<CastMember>>()
     val cast: LiveData<List<CastMember>> get() = _cast
 
-    private val _castLoading = MutableLiveData<Boolean>()
-    val castLoading: LiveData<Boolean> get() = _castLoading
 
-    private val _castError = MutableLiveData<String?>()
-    val castError: LiveData<String?> get() = _castError
+    //Live data for crew
+    private val _crew = MutableLiveData<List<CrewMember>>()
+    val crew: LiveData<List<CrewMember>> get() = _crew
+
+    private val _creditsLoading = MutableLiveData<Boolean>()
+    val creditsLoading: LiveData<Boolean> get() = _creditsLoading
+
+    private val _creditsError = MutableLiveData<String?>()
+    val creditsError: LiveData<String?> get() = _creditsError
+
 
     //Live data object for searching
     private val _searchResults = MutableLiveData<List<Movie>>()
@@ -74,9 +80,8 @@ class AppViewModel: ViewModel() {
                 val response = RetrofitInstance.api.getPopularMovies(apiKey, pageNumber)
 
                 if (response.isSuccessful) {
-                    // Safely access the results from the response
                     _movies.postValue(response.body()?.results ?: emptyList())
-                    _error.postValue(null) // Clear any previous errors
+                    _error.postValue(null)
                 } else {
                     _error.postValue("Error: ${response.message()}")
                 }
@@ -88,22 +93,25 @@ class AppViewModel: ViewModel() {
         }
     }
 
-    fun fetchMovieCast(movieId: Int) {
-        _castLoading.value = true
+    fun fetchMovieCredits(movieId: Int) {
+        _creditsLoading.value = true
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.api.getMovieCast(movieId, apiKey)
+                val response = RetrofitInstance.api.getMovieCredits(movieId, apiKey) // Adjust your API call as needed
                 if (response.isSuccessful) {
-                    // Update cast data with the cast list from the response
-                    _cast.postValue(response.body()?.cast ?: emptyList())
-                    _castError.postValue(null) // Clear any previous errors
+                    response.body()?.let { credits ->
+                        _cast.postValue(credits.cast) // Update cast LiveData
+                        // You can also create a new LiveData for crew or handle it as needed
+                        _crew.postValue(credits.crew) // If you have a separate LiveData for crew
+                        _creditsError.postValue(null) // Clear any previous errors
+                    }
                 } else {
-                    _castError.postValue("Error: ${response.message()}")
+                    _creditsError.postValue("Error: ${response.message()}")
                 }
             } catch (e: Exception) {
-                _castError.postValue("Exception: ${e.message}")
+                _creditsError.postValue("Exception: ${e.message}")
             } finally {
-                _castLoading.postValue(false)
+                _creditsLoading.postValue(false)
             }
         }
     }

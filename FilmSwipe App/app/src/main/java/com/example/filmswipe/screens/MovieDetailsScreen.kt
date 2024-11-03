@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.filmswipe.R
 import com.example.filmswipe.data.CastMember
+import com.example.filmswipe.data.CrewMember
 import com.example.filmswipe.model.AppViewModel
 
 @Composable
@@ -46,12 +47,14 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
     val appUiState by appViewModel.uiState.collectAsState()
 
     val cast by appViewModel.cast.observeAsState(emptyList())
-    val castLoading by appViewModel.castLoading.observeAsState(false)
-    val castError by appViewModel.castError.observeAsState()
+    val crew by appViewModel.crew.observeAsState(emptyList())
+
+    val castLoading by appViewModel.creditsLoading.observeAsState(false)
+    val castError by appViewModel.creditsError.observeAsState()
 
     LaunchedEffect(Unit){
         appViewModel.getScreenTitle(navController)
-        appViewModel.fetchMovieCast(appUiState.currentMovieID)
+        appViewModel.fetchMovieCredits(appUiState.currentMovieID)
     }
 
     val imageUrl = "https://image.tmdb.org/t/p/w500${appUiState.currentMoviePosterPath ?: ""}"
@@ -153,8 +156,15 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                 }
 
                 else -> {
+                    //TODO: ADD STATE THAT DISPLAYS EITHER CAST OR CREW
                     items(cast) { castMember ->
                         CastMemberListItem(castMember)
+                    }
+                    item{
+                        Text("Crew")
+                    }
+                    items(crew) { crewMember ->
+                        CrewMemberListItem(crewMember)
                     }
                 }
             }
@@ -195,6 +205,50 @@ fun CastMemberListItem(castMember: CastMember){
             )
             Text(
                 text = "as ${castMember.character}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.tertiary
+            )
+        }
+    }
+    HorizontalDivider(
+        modifier=Modifier
+            .padding(start = 20.dp, end=20.dp),
+        thickness = 1.dp,
+        color = Color.Transparent)
+}
+
+@Composable
+fun CrewMemberListItem(crewMember: CrewMember){
+    //Prefix for url of cast pic
+    val profileImageUrl = "https://image.tmdb.org/t/p/w200${crewMember.profile_path}"
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(start = 12.dp, end=12.dp)
+    ){
+        Image(
+            painter = if(crewMember.profile_path != null)
+            {rememberAsyncImagePainter(profileImageUrl)}
+            else { painterResource(R.drawable.defaultprofilepic) },
+            contentDescription = null,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .padding(4.dp),
+            contentScale = ContentScale.Crop
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            Text(
+                text = crewMember.name,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "as ${crewMember.job}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.tertiary
             )
