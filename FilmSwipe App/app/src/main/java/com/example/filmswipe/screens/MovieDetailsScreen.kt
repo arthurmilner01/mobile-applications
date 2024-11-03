@@ -155,23 +155,45 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = "Cast",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = if(!appUiState.viewingMovieCrew) FontWeight.Bold else FontWeight.Normal
-                            ),
+                        Box(
                             modifier = Modifier
                                 .clickable { appViewModel.showMovieCast() }
-                                .padding(end = 16.dp) // Optional padding for space between items
-                        )
-                        Text(
-                            text = "Crew",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = if(appUiState.viewingMovieCrew) FontWeight.Bold else FontWeight.Normal
-                            ),
+                                .padding(12.dp)
+                                .background(
+                                    color = if (!appUiState.viewingMovieCrew) MaterialTheme.colorScheme.surface.copy(
+                                        alpha = 0.5f
+                                    ) else Color.Transparent,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .padding(12.dp)
+                        ){
+                            Text(
+                                text = "Cast",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = if (!appUiState.viewingMovieCrew) FontWeight.Bold else FontWeight.Normal
+                                )
+
+                            )
+                        }
+                        Box(
                             modifier = Modifier
                                 .clickable { appViewModel.showMovieCrew() }
-                        )
+                                .padding(12.dp)
+                                .background(
+                                    color = if (appUiState.viewingMovieCrew) MaterialTheme.colorScheme.surface.copy(
+                                        alpha = 0.5f
+                                    ) else Color.Transparent,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .padding(12.dp)
+                        ){
+                            Text(
+                                text = "Crew",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = if (appUiState.viewingMovieCrew) FontWeight.Bold else FontWeight.Normal
+                                )
+                            )
+                        }
                     }
                 }
             }
