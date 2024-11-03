@@ -212,8 +212,6 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                 }
 
                 else -> {
-                    //TODO: ADD STATE THAT DISPLAYS EITHER CAST OR CREW
-
                     if(appUiState.viewingMovieCrew){
                         items(crew) { crewMember ->
                             CrewMemberListItem(crewMember)
@@ -240,7 +238,7 @@ fun CastMemberListItem(castMember: CastMember){
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
             .padding(start = 12.dp, end = 12.dp)
     ){
         Image(
@@ -261,11 +259,21 @@ fun CastMemberListItem(castMember: CastMember){
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Text(
-                text = "as ${castMember.character}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.tertiary
-            )
+            if(castMember.character.isNotEmpty()){
+                Text(
+                    text = "as ${castMember.character}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+            else{
+                Text(
+                    text = "N/A",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+
         }
     }
     HorizontalDivider(
@@ -284,7 +292,7 @@ fun CrewMemberListItem(crewMember: CrewMember){
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
             .padding(start = 12.dp, end = 12.dp)
     ){
         Image(
@@ -305,11 +313,20 @@ fun CrewMemberListItem(crewMember: CrewMember){
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Text(
-                text = "as ${crewMember.job}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.tertiary
-            )
+            if(crewMember.job.isNotEmpty()){
+                Text(
+                    text = "as ${crewMember.job}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
+            else{
+                Text(
+                    text = "N/A",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
         }
     }
     HorizontalDivider(
