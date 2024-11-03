@@ -118,7 +118,7 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modif
                         }
                     } else {
                         items(searchResults) { movie ->
-                            MovieItem(movie)
+                            MovieItem(movie, navController, appViewModel)
                         }
                     }
                 }
@@ -129,7 +129,7 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modif
 }
 
 @Composable
-fun MovieItem(movie: Movie){
+fun MovieItem(movie: Movie, navController: NavController, appViewModel: AppViewModel){
     val searchPoster = "https://image.tmdb.org/t/p/w200${movie.poster_path}"
 
     Row(
@@ -139,6 +139,8 @@ fun MovieItem(movie: Movie){
             .height(110.dp)
             .clickable {
                 //TODO: Navigate to movie details screen pass movie.id
+                appViewModel.getCurrentMovie(movie.id, movie.title, movie.overview, movie.poster_path)
+                navController.navigate("moviedetailsscreen")
             }
     ) {
         Image(
