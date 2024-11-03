@@ -111,10 +111,9 @@ fun SwipableCard(
     val rotationAngle = offsetX * 0.02f
     val cardAlpha = if(isSwiping) 1f - ((abs(offsetX) / (swipeThreshold*2))) else 1f
 
-    //Change border color based on swipe direction and intensity
-    //OLD: val borderColor = if (isSwiping) MaterialTheme.colorScheme.tertiary.copy(alpha=cardAlpha) else MaterialTheme.colorScheme.surface
+    //Sets border colour depending on swipe type
     val borderColor = when {
-        offsetY < -swipeThreshold / 2 -> Color.Blue.copy(alpha = cardAlpha) //Up
+        offsetY < -swipeThreshold / 2 -> Color.Blue.copy(alpha = cardAlpha) //Always blue if card past Y threshold / 2
         offsetX > swipeThreshold / 2 -> Color.Green.copy(alpha = cardAlpha)  //Right
         offsetX < -swipeThreshold / 2 -> Color.Red.copy(alpha = cardAlpha)   //Left
         else -> MaterialTheme.colorScheme.surface                            //Neutral
