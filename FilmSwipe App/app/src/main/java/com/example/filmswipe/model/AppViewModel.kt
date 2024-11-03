@@ -26,6 +26,7 @@ class AppViewModel: ViewModel() {
     //API
     val apiKey = "bee0c37b9c1a2d1c1ecf80b6cce631a5"
 
+    //Live data object for movies
     private val _movies = MutableLiveData<List<Movie>>()
     val movies: LiveData<List<Movie>> get() = _movies
 
@@ -34,6 +35,16 @@ class AppViewModel: ViewModel() {
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> get() = _error
+
+    //Live data object for cast
+    private val _cast = MutableLiveData<List<CastMember>>()
+    val cast: LiveData<List<CastMember>> get() = _cast
+
+    private val _castLoading = MutableLiveData<Boolean>()
+    val castLoading: LiveData<Boolean> get() = _castLoading
+
+    private val _castError = MutableLiveData<String?>()
+    val castError: LiveData<String?> get() = _castError
 
 
 
@@ -57,6 +68,26 @@ class AppViewModel: ViewModel() {
                 _error.postValue("Exception: ${e.message}")
             } finally {
                 _loading.postValue(false)
+            }
+        }
+    }
+
+    fun fetchMovieCast(movieId: Int) {
+        _castLoading.value = true
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.getMovieCast(movieId, apiKey)
+                if (response.isSuccessful) {
+                    // Update cast data with the cast list from the response
+                    _cast.postValue(response.body()?.cast ?: emptyList())
+                    _castError.postValue(null) // Clear any previous errors
+                } else {
+                    _castError.postValue("Error: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                _castError.postValue("Exception: ${e.message}")
+            } finally {
+                _castLoading.postValue(false)
             }
         }
     }
@@ -206,9 +237,10 @@ class AppViewModel: ViewModel() {
     }
 
     //Stores current movie to swipe details
-    fun getCurrentMovie(movieTitle:String, movieOverview:String, moviePosterPath:String?){
+    fun getCurrentMovie(movieID:Int, movieTitle:String, movieOverview:String, moviePosterPath:String?){
         _uiState.update{
                 currentState -> currentState.copy(
+                    currentMovieID = movieID,
                     currentMovieTitle =  movieTitle,
                     currentMovieOverview = movieOverview,
                     currentMoviePosterPath = moviePosterPath

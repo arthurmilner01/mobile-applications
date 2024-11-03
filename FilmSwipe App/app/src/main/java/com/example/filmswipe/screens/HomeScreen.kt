@@ -88,7 +88,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                         appViewModel.fetchPopularMovies()
                     }}
                 )
-                appViewModel.getCurrentMovie(movies[index].title, movies[index].overview, movies[index].poster_path)
+                appViewModel.getCurrentMovie(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
             }
         }
     }

@@ -20,6 +20,7 @@ data class AppUiState(
     val darkMode:Boolean = false,
 
     //Home
+    val currentMovieID:Int = 0,
     val currentMovieTitle:String = "",
     val currentMovieOverview:String = "",
     val currentMoviePosterPath:String? = "",
