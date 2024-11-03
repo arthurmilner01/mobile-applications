@@ -1,5 +1,7 @@
 package com.example.filmswipe.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -22,12 +24,30 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
             .fillMaxSize()
     )
     {
-        composable("loginscreen") { LoginScreen(navController, appViewModel, modifier) }
+        composable("loginscreen",
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(700)
+                )
+            })
+        { LoginScreen(navController, appViewModel, modifier) }
         composable("signupscreen") { SignUpScreen(navController, appViewModel, modifier) }
         composable("homescreen") { HomeScreen(navController, appViewModel, modifier) }
         composable("profilescreen") { ProfileScreen(navController, appViewModel, modifier) }
         composable("settingsscreen") { SettingsScreen(navController, appViewModel, modifier) }
         composable("searchscreen") { SearchScreen(navController, appViewModel, modifier) }
-        composable("moviedetailsscreen") { MovieDetailsScreen(navController, appViewModel, modifier)}
+        composable("moviedetailsscreen",
+            enterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700)
+            )},
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                )
+            }) { MovieDetailsScreen(navController, appViewModel, modifier)}
     }
 }
