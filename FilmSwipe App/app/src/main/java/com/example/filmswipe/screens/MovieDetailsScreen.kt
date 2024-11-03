@@ -62,64 +62,6 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
     val director = crew.find{ it.job == "Director" } //Finds crew member who is the director
 
     Column(modifier=Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-        ) {
-
-            //Background/header image
-            Image(
-                painter = rememberAsyncImagePainter(imageUrl),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-
-            //Box to dim the background image
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.8f))
-            )
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp)
-                        .align(Alignment.BottomStart)
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(imageUrl),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .height(150.dp)
-                            .width(100.dp)
-                            .border(2.dp, MaterialTheme.colorScheme.onBackground)
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.width(8.dp)) //Space between title and poster
-                    Column {
-                        Text(
-                            text = stringResource(
-                                R.string.movie_details_title,
-                                appUiState.currentMovieTitle
-                            ),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        if (director != null) {
-                            Text(
-                                text=stringResource(R.string.movie_director,director.name),
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        }
-                    }
-                }
-        }
 
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -127,6 +69,66 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
             modifier = Modifier
                 .fillMaxSize()
         ) {
+            item{
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                ) {
+
+                    //Background/header image
+                    Image(
+                        painter = rememberAsyncImagePainter(imageUrl),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    //Box to dim the background image
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.8f))
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.Bottom,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                            .align(Alignment.BottomStart)
+                    ) {
+                        Image(
+                            painter = rememberAsyncImagePainter(imageUrl),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .height(150.dp)
+                                .width(100.dp)
+                                .border(2.dp, MaterialTheme.colorScheme.onBackground)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.width(8.dp)) //Space between title and poster
+                        Column {
+                            Text(
+                                text = stringResource(
+                                    R.string.movie_details_title,
+                                    appUiState.currentMovieTitle
+                                ),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            if (director != null) {
+                                Text(
+                                    text=stringResource(R.string.movie_director,director.name),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             item {
                 Column(
                     modifier = Modifier
