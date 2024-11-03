@@ -204,6 +204,23 @@ class AppViewModel: ViewModel() {
         }
     }
 
+    //Profile page funs
+    fun showProfilesLikedMovies(){
+        _uiState.update{
+                currentState -> currentState.copy(
+            viewingWatchedMovies = true
+        )
+        }
+    }
+
+    fun showProfilesWatchlist(){
+        _uiState.update{
+                currentState -> currentState.copy(
+            viewingWatchedMovies = false
+        )
+        }
+    }
+
     //Settings page funcs
 
     fun updateNotifSetting(notifCheckInput: Boolean){
@@ -225,7 +242,6 @@ class AppViewModel: ViewModel() {
     }
 
     //Top bar funcs
-
     //Used to map nav host title to the displayed title
     private val screenTitles = mapOf(
         "homescreen" to "Home",

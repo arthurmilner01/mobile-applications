@@ -23,6 +23,9 @@ data class AppUiState(
     val currentMovieTitle:String = "",
     val currentMovieOverview:String = "",
     val currentMoviePosterPath:String? = "",
-    val viewingMovieDetails:Boolean = false
+    val viewingMovieDetails:Boolean = false,
+
+    //Profile
+    val viewingWatchedMovies:Boolean = false
 
 )

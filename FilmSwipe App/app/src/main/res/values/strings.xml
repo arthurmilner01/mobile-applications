@@ -2,7 +2,8 @@
     <string name="app_name">FilmSwipe</string>
     <string name="login_email">Currently Logged In: %s</string>
     <string name="profile_name">%s</string>
-    <string name="profile_watchlist">Watchlist:</string>
+    <string name="profile_watchlist">Movie Watchlist</string>
+    <string name="profile_liked">Watched Movies</string>
     <string name="movie_details_title">%s</string>
     <string name="movie_details_overview">%s</string>
 </resources>
