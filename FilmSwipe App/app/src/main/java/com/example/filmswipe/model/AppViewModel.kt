@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class AppViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(AppUiState())
@@ -40,8 +41,10 @@ class AppViewModel: ViewModel() {
         _loading.value = true
         viewModelScope.launch {
             try {
-                // Call the method from the API service
-                val response = RetrofitInstance.api.getPopularMovies(apiKey)
+                //API call with random page number
+                //TODO: TEST IF THIS IS A VALID RANGE
+                val pageNumber = Random.nextInt(1,500)
+                val response = RetrofitInstance.api.getPopularMovies(apiKey, pageNumber)
 
                 if (response.isSuccessful) {
                     // Safely access the results from the response
