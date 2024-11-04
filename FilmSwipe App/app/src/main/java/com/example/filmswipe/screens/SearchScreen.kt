@@ -1,6 +1,8 @@
 package com.example.filmswipe.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -44,7 +47,7 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modif
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 12.dp)
         ) {
             OutlinedTextField(
                 value = appViewModel.searchText,
@@ -75,7 +78,8 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modif
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
                 checked = appUiState.searchingUsers,
@@ -134,25 +138,31 @@ fun MovieItem(movie: Movie, navController: NavController, appViewModel: AppViewM
 
     Row(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(4.dp)
             .fillMaxWidth()
-            .height(110.dp)
+            .height(75.dp)
             .clickable {
                 //TODO: Navigate to movie details screen pass movie.id
                 appViewModel.getCurrentMovie(movie.id, movie.title, movie.overview, movie.poster_path)
                 navController.navigate("moviedetailsscreen")
             }
+            .border(1.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .clip(RoundedCornerShape(8.dp)),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = rememberAsyncImagePainter(searchPoster),
             contentDescription = null,
             modifier = Modifier
-                .height(100.dp)
+                .height(75.dp)
                 .width(66.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .padding(end=20.dp)
+                .padding(8.dp)
         )
-        Text(text = movie.title, style = MaterialTheme.typography.titleLarge)
+        Text(text = movie.title,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(start=20.dp)
+            )
     }
 }
 

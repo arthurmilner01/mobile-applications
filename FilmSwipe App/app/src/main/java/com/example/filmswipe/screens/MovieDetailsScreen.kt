@@ -107,9 +107,7 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                             contentDescription = null,
                             modifier = Modifier
                                 .height(150.dp)
-                                .width(100.dp)
-                                .border(2.dp, MaterialTheme.colorScheme.onBackground)
-                                .clip(RoundedCornerShape(8.dp)),
+                                .width(100.dp),
                             contentScale = ContentScale.Crop
                         )
                         Spacer(modifier = Modifier.width(8.dp)) //Space between title and poster
@@ -147,7 +145,7 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                             R.string.movie_details_overview,
                             appUiState.currentMovieOverview
                         ),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(8.dp)
                     )
 
