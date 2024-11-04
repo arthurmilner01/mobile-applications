@@ -97,30 +97,65 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                             text = {
                                 Row{
                                     Text("Disney+")
-                                    Switch(checked = true,
+                                    Switch(checked = appUiState.disneyFilter,
                                         onCheckedChange = null)
                                 }},
-                            //Set streaming filter to remove disney plus
-                            onClick = {appViewModel.modifyStreamingFilter("337")}
+                            //8 = Netflix, 337 = Disney+, 119 = Prime
+                            onClick = {
+                                if(appUiState.disneyFilter){
+                                    appViewModel.removeStreamingFilter("337")
+                                    appViewModel.setDisneyFilter()
+                                    appViewModel.fetchPopularMovies()
+                                }
+                                else{
+                                    appViewModel.addStreamingFilter("337")
+                                    appViewModel.setDisneyFilter()
+                                    appViewModel.fetchPopularMovies()
+                                }
+                            }
                         )
                         DropdownMenuItem(
                             text = {
                                 Row{
                                     Text("Amazon Prime")
-                                    Switch(checked = true,
+                                    Switch(checked = appUiState.primeFilter,
                                         onCheckedChange = null)
                             }},
-                            onClick = {appViewModel.modifyStreamingFilter("119")}
+                            onClick = {
+                                if(appUiState.primeFilter){
+                                    appViewModel.removeStreamingFilter("119")
+                                    appViewModel.setPrimeFilter()
+                                    appViewModel.fetchPopularMovies()
+                                }
+                                else{
+                                    appViewModel.addStreamingFilter("119")
+                                    appViewModel.setPrimeFilter()
+                                    appViewModel.fetchPopularMovies()
+                                }
+                            }
                         )
                         DropdownMenuItem(
                             text = {
                                 Row{
                                     Text("Netflix")
-                                    Switch(checked = true,
+                                    Switch(checked = appUiState.netflixFilter,
                                         onCheckedChange = null)
                                 }
                             },
-                            onClick = { appViewModel.modifyStreamingFilter("8")}
+                            onClick = {
+                                if(appUiState.netflixFilter){
+                                    appViewModel.removeStreamingFilter("8")
+                                    appViewModel.setNetflixFilter()
+                                    appViewModel.fetchPopularMovies()
+
+                                }
+                                else{
+                                    appViewModel.addStreamingFilter("8")
+                                    appViewModel.setNetflixFilter()
+                                    appViewModel.fetchPopularMovies()
+
+                                }
+                            }
                         )
                     }
                 }

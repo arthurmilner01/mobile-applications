@@ -10,7 +10,8 @@ interface TMDBAPIService {
     suspend fun getPopularMovies(
         @Query("api_key") apiKey: String,
         @Query("page") pageNumber: Int,
-        @Query("with_watch_providers") watchProviders: String? = null,
+        @Query("with_watch_providers") watchProviders: String,
+        @Query("watch_region") watchRegion: String = "GB",
         @Query("language") language: String = "en-US"
     ): Response<MovieResponse>
 

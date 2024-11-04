@@ -1,5 +1,6 @@
 package com.example.filmswipe.model
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -76,7 +77,7 @@ class AppViewModel: ViewModel() {
             try {
                 //API call with random page number
                 //TODO: TEST IF THIS IS A VALID RANGE
-                val pageNumber = Random.nextInt(1,500)
+                val pageNumber = Random.nextInt(1,10)
                 val response = RetrofitInstance.api.getPopularMovies(apiKey, pageNumber, _uiState.value.watchProviderFilter)
 
                 if (response.isSuccessful) {
@@ -287,14 +288,92 @@ class AppViewModel: ViewModel() {
         }
     }
     //Filter by streaming service
-    fun modifyStreamingFilter(streamingService:String){
+    fun removeStreamingFilter(streamingService:String){
+        Log.d("UIState", "Current Watch Provider Filter: ${_uiState.value.watchProviderFilter}")
+
         _uiState.update{
                 currentState -> currentState.copy(
                     watchProviderFilter = _uiState.value.watchProviderFilter
-                        .split(",")//Splits by comma
+                        .split("|")//Splits by comma
                         .filter { it != streamingService }  //Removes the given number/streaming service
-                        .joinToString(",") //Converts back into string
+                        .joinToString("|") //Converts back into string
+                        .trim() //Removes spaces
         )
+        }
+        Log.d("UIState", "Current Watch Provider Filter: ${_uiState.value.watchProviderFilter}")
+    }
+
+    fun addStreamingFilter(streamingService: String){
+        Log.d("UIState", "Current Watch Provider Filter: ${_uiState.value.watchProviderFilter}")
+        if(_uiState.value.watchProviderFilter == ""){
+            _uiState.update{
+                    currentState -> currentState.copy(
+                watchProviderFilter = _uiState.value.watchProviderFilter + streamingService
+            )
+            }
+        }
+        else{
+            _uiState.update{
+                    currentState -> currentState.copy(
+                watchProviderFilter = _uiState.value.watchProviderFilter + "|" + streamingService
+            )
+            }
+        }
+        Log.d("UIState", "Current Watch Provider Filter: ${_uiState.value.watchProviderFilter}")
+
+    }
+
+    fun setDisneyFilter(){
+        if(_uiState.value.disneyFilter){
+            _uiState.update{
+                    currentState -> currentState.copy(
+                disneyFilter = false
+            )
+            }
+        }
+        else
+        {
+            _uiState.update{
+                    currentState -> currentState.copy(
+                disneyFilter = true
+            )
+            }
+        }
+    }
+
+    fun setPrimeFilter(){
+        if(_uiState.value.primeFilter){
+            _uiState.update{
+                    currentState -> currentState.copy(
+                primeFilter = false
+            )
+            }
+        }
+        else
+        {
+            _uiState.update{
+                    currentState -> currentState.copy(
+                primeFilter = true
+            )
+            }
+        }
+    }
+
+    fun setNetflixFilter(){
+        if(_uiState.value.netflixFilter){
+            _uiState.update{
+                    currentState -> currentState.copy(
+                netflixFilter = false
+            )
+            }
+        }
+        else
+        {
+            _uiState.update{
+                    currentState -> currentState.copy(
+                netflixFilter = true
+            )
+            }
         }
     }
 
