@@ -1,18 +1,27 @@
 package com.example.filmswipe.navigation
 
+import android.widget.Space
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -61,6 +70,56 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                }
+                if (appUiState.viewingHome) {
+                    //TODO: On click display filter options
+                    IconButton(
+                        onClick = { appViewModel.expandFilterMenu() },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = appUiState.filterMenuExpanded,
+                        onDismissRequest = { appViewModel.dismissFilterMenu() }
+                    ) {
+                        //TODO: Make these change the appUiState for watchproviderfilter
+                        Text(text="Filter by Streaming Service:",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier= Modifier
+                                .padding(8.dp))
+                        DropdownMenuItem(
+                            text = {
+                                Row{
+                                    Text("Disney+")
+                                    Switch(checked = true,
+                                        onCheckedChange = null)
+                                }},
+                            onClick = {}
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Row{
+                                    Text("Amazon Prime")
+                                    Switch(checked = true,
+                                        onCheckedChange = null)
+                            }},
+                            onClick = {}
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Row{
+                                    Text("Netflix")
+                                    Switch(checked = true,
+                                        onCheckedChange = null)
+                                }
+                            },
+                            onClick = {}
                         )
                     }
                 }

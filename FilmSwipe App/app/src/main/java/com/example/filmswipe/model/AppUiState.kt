@@ -24,12 +24,16 @@ data class AppUiState(
     val currentMovieTitle:String = "",
     val currentMovieOverview:String = "",
     val currentMoviePosterPath:String? = "",
-    val viewingMovieDetails:Boolean = false,
+    //8 = Netflix, 337 = Disney+, 119 = Prime
+    val watchProviderFilter:String = "8,337,119",
+    val viewingHome:Boolean = false,
+    val filterMenuExpanded:Boolean = false,
 
     //Profile
     val viewingWatchedMovies:Boolean = false,
 
     //Movie Details
+    val viewingMovieDetails:Boolean = false,
     val viewingMovieCrew:Boolean = false,
 
     //Search

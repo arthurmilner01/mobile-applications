@@ -77,7 +77,7 @@ class AppViewModel: ViewModel() {
                 //API call with random page number
                 //TODO: TEST IF THIS IS A VALID RANGE
                 val pageNumber = Random.nextInt(1,500)
-                val response = RetrofitInstance.api.getPopularMovies(apiKey, pageNumber)
+                val response = RetrofitInstance.api.getPopularMovies(apiKey, pageNumber, _uiState.value.watchProviderFilter)
 
                 if (response.isSuccessful) {
                     _movies.postValue(response.body()?.results ?: emptyList())
@@ -346,7 +346,16 @@ class AppViewModel: ViewModel() {
         if(screenTitles[currentScreen] == ""){
             _uiState.update{
                     currentState -> currentState.copy(
-                viewingMovieDetails =  true
+                viewingMovieDetails =  true,
+                viewingHome = false
+            )
+            }
+        }
+        else if(screenTitles[currentScreen] == "Home"){
+            _uiState.update{
+                    currentState -> currentState.copy(
+                viewingMovieDetails =  false,
+                viewingHome = true
             )
             }
         }
@@ -354,9 +363,26 @@ class AppViewModel: ViewModel() {
         {
             _uiState.update{
                     currentState -> currentState.copy(
-                viewingMovieDetails =  false
+                viewingMovieDetails =  false,
+                viewingHome = false
             )
             }
+        }
+    }
+
+    fun expandFilterMenu(){
+        _uiState.update{
+                currentState -> currentState.copy(
+            filterMenuExpanded = true
+        )
+        }
+    }
+
+    fun dismissFilterMenu(){
+        _uiState.update{
+                currentState -> currentState.copy(
+            filterMenuExpanded = false
+        )
         }
     }
 
