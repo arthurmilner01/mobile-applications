@@ -1,5 +1,6 @@
 package com.example.filmswipe.screens
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -103,12 +104,20 @@ fun SwipableCard(
     onSwipeRight: () -> Unit = {},
     onSwipeUp: () -> Unit = {}
 ) {
+    //States local to swipeable card so don't need to be in appUiState
+    //Offset to track swipe
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
+    //State to track whether the card is currently being swiped
     var isSwiping by remember { mutableStateOf(false) }
-    val swipeThreshold = 150f
-
+    //How far user must swipe to register either left, right, up or down
+    val swipeThreshold = 175f
+    //States for handling smooth animation if swipe doesn't go past threshold
+    val animatedOffsetX by animateFloatAsState(targetValue = offsetX)
+    val animatedOffsetY by animateFloatAsState(targetValue = offsetY)
+    //Using offsetX to slightly rotate the card on left/right swipe
     val rotationAngle = offsetX * 0.02f
+    //Using offsetX to slowly fade out card as user swipes
     val cardAlpha = if(isSwiping) 1f - ((abs(offsetX) / (swipeThreshold*2))) else 1f
 
     //Sets border colour depending on swipe type
@@ -123,8 +132,8 @@ fun SwipableCard(
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp, top = 40.dp, bottom = 40.dp)
             .fillMaxSize(0.9f)
-            .offset(x = offsetX.dp, y= offsetY.dp)
-            .rotate(rotationAngle)  // Rotate the entire Box, including the border
+            .offset(x = animatedOffsetX.dp, y= animatedOffsetY.dp)
+            .rotate(rotationAngle)  //Rotates card based on rotation angle
             .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))
             .clickable { navController.navigate("moviedetailsscreen") }
     ){
@@ -139,18 +148,17 @@ fun SwipableCard(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp))
-                    .pointerInput(Unit) {
+                    .pointerInput(Unit) { //Handling swiping
                         detectDragGestures(
                             onDragStart = {
                                 isSwiping = true
                             },
                             onDrag = { change, dragAmount ->
                                 change.consume()
-                                offsetX += dragAmount.x
+                                offsetX += dragAmount.x //Tracking amount of drag on X
 
-                                //Allows downswipe but not beyond initial offset.y
+                                //Allows down swipe but not beyond initial offset.y
                                 val minOffsetY = offsetY + dragAmount.y
-
                                 if (minOffsetY <= 0) {
                                     offsetY = minOffsetY
                                 }
@@ -162,6 +170,7 @@ fun SwipableCard(
                                     onSwipeUp()
                                 }
                                 else if(abs(offsetX) > swipeThreshold) {
+                                    //If negative then must be left swipe else right
                                     if (offsetX < 0) onSwipeLeft() else onSwipeRight()
                                 }
                                 // Reset position and swiping state
@@ -170,7 +179,7 @@ fun SwipableCard(
                                 isSwiping = false
                             },
                             onDragCancel = {
-                                // Reset position and swiping state on cancel
+                                //Resets position
                                 offsetX = 0f
                                 isSwiping = false
                             }
