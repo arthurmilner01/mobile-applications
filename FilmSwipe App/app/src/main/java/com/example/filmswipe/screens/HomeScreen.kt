@@ -122,7 +122,7 @@ fun SwipableCard(
     Box(
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp, top = 40.dp, bottom = 40.dp)
-            .fillMaxSize()
+            .fillMaxSize(0.9f)
             .offset(x = offsetX.dp, y= offsetY.dp)
             .rotate(rotationAngle)  // Rotate the entire Box, including the border
             .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))

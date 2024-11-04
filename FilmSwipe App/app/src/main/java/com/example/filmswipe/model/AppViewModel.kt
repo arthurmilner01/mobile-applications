@@ -282,7 +282,8 @@ class AppViewModel: ViewModel() {
                     currentMovieID = movieID,
                     currentMovieTitle =  movieTitle,
                     currentMovieOverview = movieOverview,
-                    currentMoviePosterPath = moviePosterPath
+                    currentMoviePosterPath = moviePosterPath,
+                    viewingMovieCrew = false
         )
         }
     }

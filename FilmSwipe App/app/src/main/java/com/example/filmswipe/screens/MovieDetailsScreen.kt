@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,8 +20,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -148,6 +153,41 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(8.dp)
                     )
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    ) {
+                        Column(modifier = Modifier
+                            .clickable {
+                                //TODO: DB FUNC TO ADD TO WATCHED ALSO CHECK IF ADDED
+                                //TODO: AND INSTEAD DISPLAY REMOVE FROM WATCHED
+                            },
+                            horizontalAlignment = Alignment.CenterHorizontally){
+                            Icon(
+                                imageVector = Icons.Default.PlayArrow,
+                                contentDescription = "Watched Icon",
+                                tint = MaterialTheme.colorScheme.tertiary,
+                            )
+                            Text("Mark as Watched")
+                        }
+
+                        Column(modifier = Modifier
+                            .clickable {
+                                //TODO: DB FUNC TO ADD TO WATCHLIST ALSO CHECK IF ADDED
+                                //TODO: AND INSTEAD DISPLAY REMOVE FROM WATCHLIST
+                            },
+                            horizontalAlignment = Alignment.CenterHorizontally){
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Watchlist Icon",
+                                tint = MaterialTheme.colorScheme.tertiary,
+                            )
+                            Text("Add to Watchlist")
+                        }
+                    }
 
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
