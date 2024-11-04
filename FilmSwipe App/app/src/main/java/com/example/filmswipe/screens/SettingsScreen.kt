@@ -76,7 +76,23 @@ fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, mod
         Row(modifier= Modifier
             .padding(5.dp)
             .fillMaxWidth()
-            .clickable { appViewModel.userLogsOut() },
+            .clickable {  }, //TODO: MAKE FUNCTIONAL
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            Text(text = "Edit Profile",
+                modifier = modifier,
+                style= MaterialTheme.typography.labelLarge)
+        }
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
+
+        Row(modifier= Modifier
+            .padding(5.dp)
+            .fillMaxWidth()
+            .clickable {
+                appViewModel.userLogsOut()
+                navController.navigate("loginscreen")
+                       },
             verticalAlignment = Alignment.CenterVertically)
         {
             Text(text = "Log-Out",
