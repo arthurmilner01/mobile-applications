@@ -100,7 +100,8 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                                     Switch(checked = true,
                                         onCheckedChange = null)
                                 }},
-                            onClick = {}
+                            //Set streaming filter to remove disney plus
+                            onClick = {appViewModel.modifyStreamingFilter("337")}
                         )
                         DropdownMenuItem(
                             text = {
@@ -109,7 +110,7 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                                     Switch(checked = true,
                                         onCheckedChange = null)
                             }},
-                            onClick = {}
+                            onClick = {appViewModel.modifyStreamingFilter("119")}
                         )
                         DropdownMenuItem(
                             text = {
@@ -119,7 +120,7 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                                         onCheckedChange = null)
                                 }
                             },
-                            onClick = {}
+                            onClick = { appViewModel.modifyStreamingFilter("8")}
                         )
                     }
                 }

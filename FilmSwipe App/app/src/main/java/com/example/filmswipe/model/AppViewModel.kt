@@ -274,7 +274,6 @@ class AppViewModel: ViewModel() {
             _movies.value = currentList // Update the LiveData
         }
     }
-
     //Stores current movie to swipe details
     fun getCurrentMovie(movieID:Int, movieTitle:String, movieOverview:String, moviePosterPath:String?){
         _uiState.update{
@@ -287,6 +286,18 @@ class AppViewModel: ViewModel() {
         )
         }
     }
+    //Filter by streaming service
+    fun modifyStreamingFilter(streamingService:String){
+        _uiState.update{
+                currentState -> currentState.copy(
+                    watchProviderFilter = _uiState.value.watchProviderFilter
+                        .split(",")//Splits by comma
+                        .filter { it != streamingService }  //Removes the given number/streaming service
+                        .joinToString(",") //Converts back into string
+        )
+        }
+    }
+
 
     //Profile page funs
     fun showProfilesLikedMovies(){
