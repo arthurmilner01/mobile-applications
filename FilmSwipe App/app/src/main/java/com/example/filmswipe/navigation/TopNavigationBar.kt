@@ -123,12 +123,12 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                             }},
                             onClick = {
                                 if(appUiState.primeFilter){
-                                    appViewModel.removeStreamingFilter("119")
+                                    appViewModel.removeStreamingFilter("9")
                                     appViewModel.setPrimeFilter()
                                     appViewModel.fetchPopularMovies()
                                 }
                                 else{
-                                    appViewModel.addStreamingFilter("119")
+                                    appViewModel.addStreamingFilter("9")
                                     appViewModel.setPrimeFilter()
                                     appViewModel.fetchPopularMovies()
                                 }
