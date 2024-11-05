@@ -48,7 +48,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun FilmSwipeTheme(
-    darkTheme: Boolean,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     navController: NavController,
     appViewModel: AppViewModel,
     // Dynamic color is available on Android 12+

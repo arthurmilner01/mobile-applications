@@ -57,23 +57,6 @@ fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, mod
         HorizontalDivider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
 
         Row(modifier= Modifier
-            .padding(5.dp),
-            verticalAlignment = Alignment.CenterVertically)
-        {
-            Text(text = "Enable Dark Mode:",
-                modifier = modifier,
-                style= MaterialTheme.typography.labelLarge)
-            Spacer(modifier= Modifier
-                .weight(1f))
-            Switch(
-                checked = appUiState.darkMode,
-                onCheckedChange = { appViewModel.updateDarkModeSetting(it) }
-            )
-        }
-
-        HorizontalDivider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
-
-        Row(modifier= Modifier
             .padding(5.dp)
             .fillMaxWidth()
             .clickable {  }, //TODO: MAKE FUNCTIONAL

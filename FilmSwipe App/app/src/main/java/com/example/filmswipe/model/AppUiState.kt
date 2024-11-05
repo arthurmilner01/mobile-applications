@@ -17,7 +17,6 @@ data class AppUiState(
 
     //Notifications
     val enableNotifs:Boolean = true,
-    val darkMode:Boolean = false,
 
     //Home
     val currentMovieID:Int = 0,

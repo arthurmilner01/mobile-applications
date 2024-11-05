@@ -406,15 +406,6 @@ class AppViewModel: ViewModel() {
         }
     }
 
-    fun updateDarkModeSetting(darkModeInput: Boolean){
-        //TODO: Make this set dark mode on/off
-        _uiState.update{
-                currentState -> currentState.copy(
-            darkMode =  darkModeInput
-        )
-        }
-    }
-
     //Top bar funcs
     //Used to map nav host title to the displayed title
     private val screenTitles = mapOf(

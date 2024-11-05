@@ -88,9 +88,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val appViewModel: AppViewModel = viewModel()
-            val appUiState by appViewModel.uiState.collectAsState()
 
-            FilmSwipeTheme(appUiState.darkMode, navController,appViewModel){
+            FilmSwipeTheme(navController = navController, appViewModel = appViewModel){
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = { TopNavigationBar(navController, appViewModel)},
                     bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
@@ -112,9 +111,8 @@ class MainActivity : ComponentActivity() {
 fun AppPreview() {
     val navController = rememberNavController()
     val appViewModel: AppViewModel = viewModel()
-    val appUiState by appViewModel.uiState.collectAsState()
 
-    FilmSwipeTheme(appUiState.darkMode, navController,appViewModel){
+    FilmSwipeTheme(navController=navController, appViewModel = appViewModel){
         Scaffold(modifier = Modifier.fillMaxSize(),
             topBar = { TopNavigationBar(navController, appViewModel)},
             bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
