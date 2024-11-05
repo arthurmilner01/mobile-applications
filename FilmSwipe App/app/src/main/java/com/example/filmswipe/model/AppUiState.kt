@@ -15,9 +15,6 @@ data class AppUiState(
     val navSelectedItem:Int = 0,
     val navScreenTitle:String = "",
 
-    //Notifications
-    val enableNotifs:Boolean = true,
-
     //Home
     val currentMovieID:Int = 0,
     val currentMovieTitle:String = "",

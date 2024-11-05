@@ -397,14 +397,7 @@ class AppViewModel: ViewModel() {
 
     //Settings page funcs
 
-    fun updateNotifSetting(notifCheckInput: Boolean){
-        //TODO: Make this actually change notif settings on phone
-        _uiState.update{
-                currentState -> currentState.copy(
-            enableNotifs =  notifCheckInput
-        )
-        }
-    }
+
 
     //Top bar funcs
     //Used to map nav host title to the displayed title
