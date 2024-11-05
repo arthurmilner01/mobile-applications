@@ -13,8 +13,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +56,7 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = appUiState.navScreenTitle,
+                        text = if(appUiState.viewingHome){ "" } else{ appUiState.navScreenTitle},
                         color = MaterialTheme.colorScheme.tertiary,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
@@ -79,7 +82,7 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                         onClick = { appViewModel.expandFilterMenu() },
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Menu,
+                            imageVector = Icons.Default.Edit,
                             contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.tertiary
                         )
@@ -161,7 +164,8 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = if(appUiState.viewingHome){ Color.Transparent } else{ MaterialTheme.colorScheme.surface}
+
             )
         )
     }
