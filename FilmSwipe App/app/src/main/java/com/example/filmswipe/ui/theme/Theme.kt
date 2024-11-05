@@ -33,7 +33,6 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    //TODO: Change to lighter colours
     primary = Color(0xFF62568b),
     secondary = Color(0xFFFF5733),
     tertiary = Color(0xFF775460),
