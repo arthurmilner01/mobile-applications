@@ -77,7 +77,6 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                     }
                 }
                 if (appUiState.viewingHome) {
-                    //TODO: On click display filter options
                     IconButton(
                         onClick = { appViewModel.expandFilterMenu() },
                     ) {
@@ -91,7 +90,6 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                         expanded = appUiState.filterMenuExpanded,
                         onDismissRequest = { appViewModel.dismissFilterMenu() }
                     ) {
-                        //TODO: Make these change the appUiState for watchproviderfilter
                         Text(text="Filter by Streaming Service:",
                             style = MaterialTheme.typography.titleSmall,
                             modifier= Modifier
