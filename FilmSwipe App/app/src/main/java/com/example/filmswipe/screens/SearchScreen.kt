@@ -20,17 +20,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.filmswipe.R
+import com.example.filmswipe.data.FilmswipeUser
 import com.example.filmswipe.data.Movie
 import com.example.filmswipe.model.AppViewModel
+import com.google.firebase.firestore.auth.User
 
 @Composable
 fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
 
     val appUiState by appViewModel.uiState.collectAsState()
     val searchResults by appViewModel.searchResults.observeAsState(emptyList())
+    val userSearchResults by appViewModel.userSearchResults.observeAsState(emptyList())
 
     LaunchedEffect(Unit){
         appViewModel.getScreenTitle(navController)
@@ -99,7 +104,23 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modif
                         )
                     }
                 }
-                //TODO: DB call here against search to display users
+                else
+                {
+                    if (userSearchResults.isEmpty()) {
+                        item {
+                            Text(
+                                text = "Hit search to confirm your input. If this message remains please try a different search term.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(top = 16.dp)
+                            )
+                        }
+                    } else {
+                        items(userSearchResults) { user ->
+                            UserItem(user, navController, appViewModel)
+                        }
+                    }
+                }
+
             }
             else
             {
@@ -163,6 +184,53 @@ fun MovieItem(movie: Movie, navController: NavController, appViewModel: AppViewM
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start=20.dp)
             )
+    }
+}
+
+@Composable
+fun UserItem(filmswipeUser: FilmswipeUser, navController: NavController, appViewModel: AppViewModel){
+    val profilePicture = filmswipeUser.profile_picture
+    val defaultProfilePic = painterResource(R.drawable.defaultprofilepic)
+
+    Row(
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxWidth()
+            .height(75.dp)
+            .clickable {
+                //TODO: Navigate to users profile
+            }
+            .border(1.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .clip(RoundedCornerShape(8.dp)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        //TODO: Show user profile image
+        if(filmswipeUser.profile_picture != null){
+            Image(
+                painter = rememberAsyncImagePainter(profilePicture),
+                contentDescription = null,
+                modifier = Modifier
+                    .height(75.dp)
+                    .width(66.dp)
+                    .padding(8.dp)
+            )
+        }
+        else
+        {
+            Image(
+                painter = defaultProfilePic,
+                contentDescription = null,
+                modifier = Modifier
+                    .height(75.dp)
+                    .width(66.dp)
+                    .padding(8.dp)
+            )
+        }
+        Text(text = filmswipeUser.username,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(start=20.dp)
+        )
     }
 }
 

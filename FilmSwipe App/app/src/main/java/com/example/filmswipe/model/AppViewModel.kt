@@ -78,6 +78,10 @@ class AppViewModel: ViewModel() {
     private val _searchResults = MutableLiveData<List<Movie>>()
     val searchResults: LiveData<List<Movie>> get() = _searchResults
 
+    //Live data object for user searching
+    private val _userSearchResults = MutableLiveData<List<FilmswipeUser>>()
+    val userSearchResults: LiveData<List<FilmswipeUser>> = _userSearchResults
+
 
 
     fun fetchPopularMovies() {
@@ -163,7 +167,6 @@ class AppViewModel: ViewModel() {
     }
 
     fun checkLoginDetails(){
-        //TODO: Use database for validation
         //If either email or password blank
         if (emailInput.isBlank() || passwordInput.isBlank()) {
             _uiState.update {
@@ -232,7 +235,7 @@ class AppViewModel: ViewModel() {
             currentState -> currentState.copy(
                 isLoggedIn = true,
                 loggedInEmail = currentEmailInput,
-                loggedInUsername =  currentUsernameInput, //TODO: Use username when implemented
+                loggedInUsername =  currentUsernameInput,
                 incorrectLogin = false
         )
         }
@@ -526,11 +529,41 @@ class AppViewModel: ViewModel() {
     fun updateSearchQuery(newSearchText:String){
         searchText = newSearchText
         _searchResults.postValue(emptyList())
+        _userSearchResults.postValue(emptyList())
+
     }
 
     fun performUserSearch() {
         val currentQuery = searchText
-        //TODO: Get users
+        db.collection("users")
+            //Search usernames
+            .whereGreaterThanOrEqualTo("username", currentQuery)
+            .whereLessThanOrEqualTo("username", currentQuery)
+            .whereNotEqualTo("username", _uiState.value.loggedInUsername)
+            .get()
+            .addOnSuccessListener { queryResults ->
+                //List to store usernames
+                val users = mutableListOf<FilmswipeUser>()
+
+                Log.d("performUserSearch", "Number of users found: ${queryResults.size()}")
+
+                // Loop through the results and extract usernames
+                for (document in queryResults) {
+                    //Grab current users username and profile picture
+                    val username = document.getString("username")
+                    val profilePicture = document.getString("profile_picture")
+                    //Creating filmswipe user object
+                    if (username != null) {
+                        val filmswipeUser = FilmswipeUser(username, profilePicture)
+                        users.add(filmswipeUser) //Add to users list
+                    }
+                }
+                //Adds the users to the live data object
+                _userSearchResults.postValue(users)
+            }
+            .addOnFailureListener { exception ->
+                _error.postValue("Search failed: ${exception.message}")
+            }
     }
 
     //Toggle box changes search type
