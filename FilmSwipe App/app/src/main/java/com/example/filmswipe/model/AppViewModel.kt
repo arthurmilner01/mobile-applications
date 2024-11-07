@@ -13,20 +13,19 @@ import androidx.navigation.NavController
 import com.example.filmswipe.data.*
 import com.example.filmswipe.network.*
 import com.google.android.gms.common.api.Response
+import com.google.firebase.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
 import kotlin.random.Random
 
 class AppViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(AppUiState())
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
-
-    //Auth firebase instance
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     //User input
     //Log In
@@ -39,6 +38,12 @@ class AppViewModel: ViewModel() {
     // Search
     var searchText by mutableStateOf("")
     var searchCheckbox by mutableStateOf(false)
+
+    //Database
+    //Auth firebase instance
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    //Firebase db instance
+    private val db = Firebase.firestore
 
     //API
     val apiKey = "bee0c37b9c1a2d1c1ecf80b6cce631a5"
