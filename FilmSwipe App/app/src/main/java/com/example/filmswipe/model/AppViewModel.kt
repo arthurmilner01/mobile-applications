@@ -164,17 +164,47 @@ class AppViewModel: ViewModel() {
 
     fun checkLoginDetails(){
         //TODO: Use database for validation
-        if((emailInput.equals("a", ignoreCase=true)) && (passwordInput == "a")){
-            userLogsIn(currentEmailInput = emailInput)
-        }
-        else{
-            _uiState.update{
-                    currentState -> currentState.copy(
+        //If either email or password blank
+        if (emailInput.isBlank() || passwordInput.isBlank()) {
+            _uiState.update {
+                currentState -> currentState.copy(
                 incorrectLogin = true,
                 isLoggedIn = false
-            )
+                )
             }
         }
+
+        auth.signInWithEmailAndPassword(emailInput, passwordInput)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    //Login successful
+                    val user = auth.currentUser
+                    //Sends username and email to user logs in function
+                    user?.let {
+                        db.collection("users").document(user.uid).get()
+                            .addOnSuccessListener { document ->
+                                val username = document.getString("username") ?: "Unknown User"
+                                userLogsIn(user.email ?: "", username)
+                            }
+                            .addOnFailureListener { exception ->
+                                _error.postValue("Failed to retrieve username: ${exception.message}")
+                            }
+                    }
+                } else {
+                    // Login failed
+                    _uiState.update {
+                        currentState -> currentState.copy(
+                        incorrectLogin = true, isLoggedIn = false
+                        )}
+                    _error.postValue("Login failed: ${task.exception?.message}")
+                }
+            }
+            .addOnFailureListener { exception ->
+                _error.postValue("Exception: ${exception.message}")
+            }
+            .addOnCompleteListener {
+                _loading.postValue(false)
+            }
     }
 
     fun userLogsOut(){
@@ -196,12 +226,12 @@ class AppViewModel: ViewModel() {
         }
     }
 
-    private fun userLogsIn(currentEmailInput:String){
+    private fun userLogsIn(currentEmailInput:String, currentUsernameInput: String){
         _uiState.update{
             currentState -> currentState.copy(
                 isLoggedIn = true,
                 loggedInEmail = currentEmailInput,
-                loggedInUsername = "tempusername", //TODO: Use username when implemented
+                loggedInUsername =  currentUsernameInput, //TODO: Use username when implemented
                 incorrectLogin = false
         )
         }
