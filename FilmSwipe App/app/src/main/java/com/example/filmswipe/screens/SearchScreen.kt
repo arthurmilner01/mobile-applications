@@ -99,6 +99,7 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modif
                         )
                     }
                 }
+                //TODO: DB call here against search to display users
             }
             else
             {
@@ -142,7 +143,6 @@ fun MovieItem(movie: Movie, navController: NavController, appViewModel: AppViewM
             .fillMaxWidth()
             .height(75.dp)
             .clickable {
-                //TODO: Navigate to movie details screen pass movie.id
                 appViewModel.getCurrentMovie(movie.id, movie.title, movie.overview, movie.poster_path)
                 navController.navigate("moviedetailsscreen")
             }

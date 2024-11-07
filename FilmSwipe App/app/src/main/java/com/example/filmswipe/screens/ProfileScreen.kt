@@ -35,6 +35,8 @@ import kotlin.math.abs
 fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier){
     LaunchedEffect(Unit){
         appViewModel.getScreenTitle(navController)
+        //TODO: Run DB queries to return watchlist and watched films
+
     }
 
     val appUiState by appViewModel.uiState.collectAsState()
@@ -91,16 +93,16 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
 
         if(appUiState.viewingWatchedMovies){
             //If user clicks liked movies label
+            //TODO: Add list of watched films here from db call
             Text("Viewing Watched Movies")
         }
         else
         {
             //If user has watchlist label selected
+            //TODO: Add list of watchlist films from db call
             Text("Viewing Watchlist")
         }
 
-
-        //TODO: Add list of watch listed films here
 
     }
 }

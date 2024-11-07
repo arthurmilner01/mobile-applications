@@ -69,6 +69,9 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
             for (index in movies.indices.reversed()) {
                 val isLastMovie = index == movies.size - 1 //Checking if last film
 
+                //TODO: DB call to check film not already in watchlist/watched for user
+                //TODO: Also if isLastMovie must handle this
+
                 SwipableCard(
                     navController = navController,
                     title = movies[index].title,
