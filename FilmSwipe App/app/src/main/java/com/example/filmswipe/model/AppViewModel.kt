@@ -18,11 +18,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
 import kotlin.random.Random
 
 class AppViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(AppUiState())
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
+
+    //Auth firebase instance
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     //User input
     //Log In
@@ -155,7 +159,7 @@ class AppViewModel: ViewModel() {
 
     fun checkLoginDetails(){
         //TODO: Use database for validation
-        if((emailInput.equals("arthur@email.com", ignoreCase=true)) && (passwordInput == "password")){
+        if((emailInput.equals("a", ignoreCase=true)) && (passwordInput == "a")){
             userLogsIn(currentEmailInput = emailInput)
         }
         else{
