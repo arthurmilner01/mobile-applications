@@ -194,7 +194,8 @@ class AppViewModel: ViewModel() {
                     // Login failed
                     _uiState.update {
                         currentState -> currentState.copy(
-                        incorrectLogin = true, isLoggedIn = false
+                        incorrectLogin = true,
+                        isLoggedIn = false
                         )}
                     _error.postValue("Login failed: ${task.exception?.message}")
                 }
@@ -253,38 +254,51 @@ class AppViewModel: ViewModel() {
     }
 
     fun checkSignUpDetails(){
-        if(true) { //TODO: Database validation if user doesn't exist
-            _uiState.update { currentState ->
-                currentState.copy(
-                    incorrectSignUp = false
-                )
+
+        auth.createUserWithEmailAndPassword(signUpEmailInput, signUpPasswordInput)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    //If account is unique will add to firebase
+                    val user = auth.currentUser
+                    user?.let {
+                        //Maps username and email input for insertion into user collection
+                        val userDetails = mapOf(
+                            "username" to signUpUsernameInput,
+                            "email" to signUpEmailInput
+                        )
+                        //Adds user info to firebase
+                        db.collection("users").document(user.uid).set(userDetails)
+                            .addOnSuccessListener {
+                                //Update UI and text inputs
+                                signUpEmailInput = ""
+                                signUpPasswordInput = ""
+                                signUpUsernameInput = ""
+                                emailInput = ""
+                                passwordInput = ""
+
+                                _uiState.update { currentState ->
+                                    currentState.copy(
+                                        incorrectSignUp = false,
+                                        isSignedUp = true
+                                    )
+                                }
+                            }
+                            .addOnFailureListener { exception ->
+                                _error.postValue("Failed to save user info: ${exception.message}")
+                            }
+                    }
+                } else {
+                    //If sign up fails display error and set UI states
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            incorrectSignUp = true,
+                            isSignedUp = false
+                        )
+                    }
+                    //Display reason for error
+                    _error.postValue("Sign-up failed: ${task.exception?.message}")
+                }
             }
-            userSignsUp()
-        }
-        else{
-            _uiState.update { currentState ->
-                currentState.copy(
-                    incorrectSignUp = true
-                )
-            }
-        }
-    }
-
-    private fun userSignsUp(){
-        //TODO: Add user to database
-
-        signUpEmailInput = ""
-        signUpPasswordInput = ""
-        signUpUsernameInput = ""
-        emailInput = ""
-        passwordInput = ""
-
-        _uiState.update { currentState ->
-            currentState.copy(
-                incorrectSignUp = false,
-                isSignedUp = true
-            )
-        }
     }
 
     //Home page funcs
