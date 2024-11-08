@@ -67,31 +67,47 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
         }
         else{ //If API call is successful
             for (index in movies.indices.reversed()) {
-                val isLastMovie = index == movies.size - 1 //Checking if last film
-
                 //TODO: DB call to check film not already in watchlist/watched for user
                 //TODO: Also if isLastMovie must handle this
+                //Checking if last film
+                val isLastMovie = index == movies.size - 1
 
-                SwipableCard(
-                    navController = navController,
-                    title = movies[index].title,
-                    subtitle = movies[index].overview,
-                    filmImage = movies[index].poster_path,
-                    onSwipeLeft = {
-                        appViewModel.removeMovie(index)
-                        if(isLastMovie) {
-                            appViewModel.fetchPopularMovies()
-                        } },
-                    onSwipeRight = { appViewModel.removeLikedMovie(index)
-                        if(isLastMovie) {
-                            appViewModel.fetchPopularMovies()
-                        } },
-                    onSwipeUp = { appViewModel.removeWatchedMovie(index)
-                    if(isLastMovie){
+                appViewModel.checkMovieInWatchlist(movieID = movies[index].id)
+                appViewModel.checkMovieInWatched(movieID = movies[index].id)
+
+                //If movie either watched or in watchlist do not display
+                //and remove from list
+                if(appUiState.movieInWatched || appUiState.movieInWatchlist){
+                    appViewModel.removeMovie(index)
+                    if(isLastMovie) {
                         appViewModel.fetchPopularMovies()
-                    }}
-                )
-                appViewModel.getCurrentMovie(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
+                    }
+                }
+                else
+                {
+                    SwipableCard(
+                        navController = navController,
+                        title = movies[index].title,
+                        subtitle = movies[index].overview,
+                        filmImage = movies[index].poster_path,
+                        onSwipeLeft = {
+                            appViewModel.removeMovie(index)
+                            if(isLastMovie) {
+                                appViewModel.fetchPopularMovies()
+                            } },
+                        onSwipeRight = { appViewModel.removeLikedMovie(index)
+                            if(isLastMovie) {
+                                appViewModel.fetchPopularMovies()
+                            } },
+                        onSwipeUp = {
+                            appViewModel.addMovieToWatchedList(movies[index])
+                            appViewModel.removeWatchedMovie(index)
+                            if(isLastMovie){
+                                appViewModel.fetchPopularMovies()
+                            }}
+                    )
+                    appViewModel.getCurrentMovie(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
+                }
             }
         }
     }

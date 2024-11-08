@@ -6,6 +6,7 @@ data class AppUiState(
     val isLoggedIn:Boolean = false,
     val loggedInEmail:String = "",
     val loggedInUsername:String = "",
+    val loggedInUID:String = "",
 
     //Signup
     val incorrectSignUp:Boolean = false,
@@ -26,6 +27,8 @@ data class AppUiState(
     val disneyFilter:Boolean = false,
     val viewingHome:Boolean = false,
     val filterMenuExpanded:Boolean = false,
+    val movieInWatchlist:Boolean = false,
+    val movieInWatched:Boolean = false,
 
     //Profile
     val viewingWatchedMovies:Boolean = false,

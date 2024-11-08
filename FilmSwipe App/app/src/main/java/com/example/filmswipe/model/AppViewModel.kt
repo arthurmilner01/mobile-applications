@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.tasks.await
 import kotlin.random.Random
 
 class AppViewModel: ViewModel() {
@@ -187,7 +188,7 @@ class AppViewModel: ViewModel() {
                         db.collection("users").document(user.uid).get()
                             .addOnSuccessListener { document ->
                                 val username = document.getString("username") ?: "Unknown User"
-                                userLogsIn(user.email ?: "", username)
+                                userLogsIn(user.email ?: "", username, user.uid)
                             }
                             .addOnFailureListener { exception ->
                                 _error.postValue("Failed to retrieve username: ${exception.message}")
@@ -217,6 +218,7 @@ class AppViewModel: ViewModel() {
             isLoggedIn = false,
             loggedInEmail = "",
             loggedInUsername = "",
+            loggedInUID = "",
             incorrectLogin = false
         )
         }
@@ -230,12 +232,13 @@ class AppViewModel: ViewModel() {
         }
     }
 
-    private fun userLogsIn(currentEmailInput:String, currentUsernameInput: String){
+    private fun userLogsIn(currentEmailInput:String, currentUsernameInput: String, userUID: String){
         _uiState.update{
             currentState -> currentState.copy(
                 isLoggedIn = true,
                 loggedInEmail = currentEmailInput,
                 loggedInUsername =  currentUsernameInput,
+                loggedInUID = userUID,
                 incorrectLogin = false
         )
         }
@@ -305,6 +308,81 @@ class AppViewModel: ViewModel() {
     }
 
     //Home page funcs
+    //DB check to not display movies already in watchlist or watched
+     fun checkMovieInWatchlist(movieID: Int){
+            db.collection("users")
+                .document(_uiState.value.loggedInUID)
+                .collection("watchlist")
+                .document(movieID.toString())
+                .get()
+                .addOnSuccessListener { watchlistCheck->
+                    if(watchlistCheck.exists())
+                    {
+                        //Set UI state true
+                        _uiState.update{
+                                currentState -> currentState.copy(
+                            movieInWatchlist = true
+                        )
+                        }
+                    }
+                    else
+                    {
+                        _uiState.update{
+                                currentState -> currentState.copy(
+                            movieInWatchlist = false
+                        )
+                        }
+                    }
+                }
+                .addOnFailureListener{
+                    //TODO: What to do if check fails
+                    _uiState.update{
+                            currentState -> currentState.copy(
+                        movieInWatchlist = false
+                    )
+                    }
+                    Log.d("Watchlist check failed", "Check has failed")
+
+                }
+    }
+
+    fun checkMovieInWatched(movieID: Int){
+        db.collection("users")
+            .document(_uiState.value.loggedInUID)
+            .collection("watched")
+            .document(movieID.toString())
+            .get()
+            .addOnSuccessListener { watchlistCheck->
+                if(watchlistCheck.exists())
+                {
+                    //Set UI state true
+                    _uiState.update{
+                            currentState -> currentState.copy(
+                        movieInWatched = true
+                    )
+                    }
+                }
+                else
+                {
+                    _uiState.update{
+                            currentState -> currentState.copy(
+                        movieInWatched = false
+                    )
+                    }
+                }
+            }
+            .addOnFailureListener{
+                //TODO: What to do if check fails
+                _uiState.update{
+                        currentState -> currentState.copy(
+                    movieInWatched = false
+                )
+                }
+                Log.d("Watched check failed", "Check has failed")
+            }
+    }
+
+
     //Swipe left
     fun removeMovie(index: Int) {
         val currentList = _movies.value?.toMutableList() ?: return
@@ -331,6 +409,30 @@ class AppViewModel: ViewModel() {
             _movies.value = currentList // Update the LiveData
         }
     }
+
+    fun addMovieToWatchedList(movie: Movie) {
+        //Mapping movie details to db fields
+        val movieDetails = mapOf(
+            "title" to movie.title,
+            "overview" to movie.overview,
+            "poster_url" to movie.poster_path,
+        )
+        //Gets path where to movie will be inserted
+        val moviePath = db.collection("users")
+            .document(_uiState.value.loggedInUID)
+            .collection("watched")
+            .document(movie.id.toString())
+
+        moviePath.set(movieDetails)
+            .addOnSuccessListener {
+                // Success
+                Log.d("Movie to Watched:","Movie added to watched")
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Movie to Watched:", "Movie failed to add to watched$exception")
+            }
+    }
+
     //Stores current movie to swipe details
     fun getCurrentMovie(movieID:Int, movieTitle:String, movieOverview:String, moviePosterPath:String?){
         _uiState.update{
@@ -533,6 +635,7 @@ class AppViewModel: ViewModel() {
 
     }
 
+    //TODO: Reference this
     //https://inorganik.medium.com/implementing-a-simple-effective-search-in-firebase-with-just-firestore-957dd716ccdb
     //Reference for string matching with firebase
     fun performUserSearch() {
