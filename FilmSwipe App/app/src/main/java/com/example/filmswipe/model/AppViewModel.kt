@@ -391,26 +391,9 @@ class AppViewModel: ViewModel() {
             _movies.value = currentList // Update the LiveData
         }
     }
-    //Swipe right
-    fun removeLikedMovie(index: Int) {
-        //TODO: Save to watchlist in db before removing
-        val currentList = _movies.value?.toMutableList() ?: return
-        if (index in currentList.indices) {
-            currentList.removeAt(index)
-            _movies.value = currentList // Update the LiveData
-        }
-    }
-    //Swipe up
-    fun removeWatchedMovie(index: Int){
-        //TODO: Save as watched movie in db before removing
-        val currentList = _movies.value?.toMutableList() ?: return
-        if (index in currentList.indices) {
-            currentList.removeAt(index)
-            _movies.value = currentList // Update the LiveData
-        }
-    }
 
-    fun addMovieToWatchedList(movie: Movie) {
+    //Runs on swipe up
+    fun addMovieToWatched(movie: Movie) {
         //Mapping movie details to db fields
         val movieDetails = mapOf(
             "title" to movie.title,
@@ -432,6 +415,30 @@ class AppViewModel: ViewModel() {
                 Log.d("Movie to Watched:", "Movie failed to add to watched$exception")
             }
     }
+
+    fun addMovieToWatchlist(movie: Movie) {
+        //Mapping movie details to db fields
+        val movieDetails = mapOf(
+            "title" to movie.title,
+            "overview" to movie.overview,
+            "poster_url" to movie.poster_path,
+        )
+        //Gets path where to movie will be inserted
+        val moviePath = db.collection("users")
+            .document(_uiState.value.loggedInUID)
+            .collection("watchlist")
+            .document(movie.id.toString())
+
+        moviePath.set(movieDetails)
+            .addOnSuccessListener {
+                // Success
+                Log.d("Movie to Watchlist:","Movie added to Watchlist")
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Movie to Watchlist:", "Movie failed to add to Watchlist$exception")
+            }
+    }
+
 
     //Stores current movie to swipe details
     fun getCurrentMovie(movieID:Int, movieTitle:String, movieOverview:String, moviePosterPath:String?){

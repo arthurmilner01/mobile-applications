@@ -95,13 +95,15 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                             if(isLastMovie) {
                                 appViewModel.fetchPopularMovies()
                             } },
-                        onSwipeRight = { appViewModel.removeLikedMovie(index)
+                        onSwipeRight = {
+                            appViewModel.addMovieToWatchlist(movies[index])
+                            appViewModel.removeMovie(index)
                             if(isLastMovie) {
                                 appViewModel.fetchPopularMovies()
                             } },
                         onSwipeUp = {
-                            appViewModel.addMovieToWatchedList(movies[index])
-                            appViewModel.removeWatchedMovie(index)
+                            appViewModel.addMovieToWatched(movies[index])
+                            appViewModel.removeMovie(index)
                             if(isLastMovie){
                                 appViewModel.fetchPopularMovies()
                             }}
