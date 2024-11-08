@@ -53,11 +53,9 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
 
     LaunchedEffect(Unit){
         appViewModel.getScreenTitle(navController)
+        //Functions which update watchlistedMovies and watchedMovies
         appViewModel.usersWatchlistedMovies()
         appViewModel.usersWatchedMovies()
-        //TODO: Run DB queries to return watchlist and watched films
-        //Function returns list of all movies added to watchlist
-
     }
 
 
@@ -116,21 +114,19 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
         ) {
             if(appUiState.viewingWatchedMovies){
                 //If user clicks liked movies label
-                //TODO: Add list of watched films here from db call
                 items(watchedMovies){ watchedMovie ->
                     //For each movie place profile movie composable
-                    ProfileMovieCard(watchedMovie)
+                    ProfileMovieCard(watchedMovie, appViewModel, navController)
 
                 }
             }
             else
             {
                 //If user has watchlist label selected
-                //TODO: Add list of watchlist films from db call
                 //For each watchlisted movie
                 items(watchlistedMovies){ watchlistedMovie ->
                     //For each movie place profile movie composable
-                    ProfileMovieCard(watchlistedMovie)
+                    ProfileMovieCard(watchlistedMovie, appViewModel, navController)
 
                 }
 
@@ -142,7 +138,7 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
 }
 
 @Composable
-fun ProfileMovieCard(profileMovie: ProfileMovie){
+fun ProfileMovieCard(profileMovie: ProfileMovie, appViewModel: AppViewModel, navController: NavController){
     //TODO: Make clickable to display movie details
     val ifNotPoster = painterResource(R.drawable.defaultprofilepic)
     val imageUrl = "https://image.tmdb.org/t/p/w500${profileMovie.poster_path ?: ""}"
@@ -156,7 +152,11 @@ fun ProfileMovieCard(profileMovie: ProfileMovie){
                 contentDescription = null,
                 modifier = Modifier
                     .height(150.dp)
-                    .width(100.dp),
+                    .width(100.dp)
+                    .clickable {
+                        appViewModel.getCurrentMovie(profileMovie.id.toInt(), profileMovie.title, profileMovie.overview, profileMovie.poster_path)
+                        navController.navigate("moviedetailsscreen")
+                    },
                 contentScale = ContentScale.Crop
             )
         }
@@ -167,7 +167,11 @@ fun ProfileMovieCard(profileMovie: ProfileMovie){
                 contentDescription = null,
                 modifier = Modifier
                     .height(150.dp)
-                    .width(100.dp),
+                    .width(100.dp)
+                    .clickable {
+                        appViewModel.getCurrentMovie(profileMovie.id.toInt(), profileMovie.title, profileMovie.overview, profileMovie.poster_path)
+                        navController.navigate("moviedetailsscreen")
+                    },
                 contentScale = ContentScale.Crop
             )
         }
