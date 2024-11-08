@@ -401,18 +401,18 @@ class AppViewModel: ViewModel() {
     }
 
     //Runs on swipe up
-    fun addMovieToWatched(movie: Movie) {
+    fun addMovieToWatched(id:Int, title:String, overview:String, poster_path:String?) {
         //Mapping movie details to db fields
         val movieDetails = mapOf(
-            "title" to movie.title,
-            "overview" to movie.overview,
-            "poster_path" to movie.poster_path,
+            "title" to title,
+            "overview" to overview,
+            "poster_path" to poster_path,
         )
         //Gets path where to movie will be inserted
         val moviePath = db.collection("users")
             .document(_uiState.value.loggedInUID)
             .collection("watched")
-            .document(movie.id.toString())
+            .document(id.toString())
 
         moviePath.set(movieDetails)
             .addOnSuccessListener {
@@ -424,18 +424,18 @@ class AppViewModel: ViewModel() {
             }
     }
 
-    fun addMovieToWatchlist(movie: Movie) {
+    fun addMovieToWatchlist(id:Int, title:String, overview:String, poster_path:String?) {
         //Mapping movie details to db fields
         val movieDetails = mapOf(
-            "title" to movie.title,
-            "overview" to movie.overview,
-            "poster_path" to movie.poster_path,
+            "title" to title,
+            "overview" to overview,
+            "poster_path" to poster_path,
         )
         //Gets path where to movie will be inserted
         val moviePath = db.collection("users")
             .document(_uiState.value.loggedInUID)
             .collection("watchlist")
-            .document(movie.id.toString())
+            .document(id.toString())
 
         moviePath.set(movieDetails)
             .addOnSuccessListener {
@@ -624,6 +624,40 @@ class AppViewModel: ViewModel() {
             .addOnFailureListener { exception ->
                 Log.d("Error getting watchlist:", "Failed$exception")
                 _watchedMovies.value = emptyList() //Set as empty on failure
+            }
+    }
+
+    fun removeMovieFromWatched(id:Int) {
+        //Gets path where to movie will be deleted
+        val moviePath = db.collection("users")
+            .document(_uiState.value.loggedInUID)
+            .collection("watched")
+            .document(id.toString())
+
+        moviePath.delete()
+            .addOnSuccessListener {
+                // Success
+                Log.d("Movie to Watched:","Movie removed from watched")
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Movie to Watched:", "Movie failed to remove from watched$exception")
+            }
+    }
+
+    fun removeMovieFromWatchlist(id:Int) {
+        //Gets path where to movie will be deleted
+        val moviePath = db.collection("users")
+            .document(_uiState.value.loggedInUID)
+            .collection("watchlist")
+            .document(id.toString())
+
+        moviePath.delete()
+            .addOnSuccessListener {
+                // Success
+                Log.d("Movie to Watchlist:","Movie removed from watchlist")
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Movie to Watchlist:", "Movie failed to remove from watchlist$exception")
             }
     }
 

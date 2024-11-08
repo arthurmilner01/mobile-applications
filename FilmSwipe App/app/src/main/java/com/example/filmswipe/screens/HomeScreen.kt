@@ -96,13 +96,13 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                                 appViewModel.fetchPopularMovies()
                             } },
                         onSwipeRight = {
-                            appViewModel.addMovieToWatchlist(movies[index])
+                            appViewModel.addMovieToWatchlist(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
                             appViewModel.removeMovie(index)
                             if(isLastMovie) {
                                 appViewModel.fetchPopularMovies()
                             } },
                         onSwipeUp = {
-                            appViewModel.addMovieToWatched(movies[index])
+                            appViewModel.addMovieToWatched(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
                             appViewModel.removeMovie(index)
                             if(isLastMovie){
                                 appViewModel.fetchPopularMovies()

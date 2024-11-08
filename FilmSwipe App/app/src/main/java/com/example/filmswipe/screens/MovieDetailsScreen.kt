@@ -63,6 +63,8 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
     LaunchedEffect(Unit){
         appViewModel.getScreenTitle(navController)
         appViewModel.fetchMovieCredits(appUiState.currentMovieID)
+        appViewModel.checkMovieInWatchlist(movieID = appUiState.currentMovieID)
+        appViewModel.checkMovieInWatched(movieID = appUiState.currentMovieID)
     }
 
     val imageUrl = "https://image.tmdb.org/t/p/w500${appUiState.currentMoviePosterPath ?: ""}"
@@ -160,24 +162,44 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                             .fillMaxWidth()
                             .padding(12.dp)
                     ) {
-                        Column(modifier = Modifier
-                            .clickable {
-                                //TODO: DB FUNC TO ADD TO WATCHED ALSO CHECK IF ADDED
-                                //TODO: AND INSTEAD DISPLAY REMOVE FROM WATCHED
-                            },
-                            horizontalAlignment = Alignment.CenterHorizontally){
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = "Watched Icon",
-                                tint = MaterialTheme.colorScheme.tertiary,
-                            )
-                            Text("Mark as Watched")
+                        if(appUiState.movieInWatched){
+                            Column(modifier = Modifier
+                                .clickable {
+                                    appViewModel.removeMovieFromWatched(appUiState.currentMovieID)
+                                    appViewModel.checkMovieInWatched(appUiState.currentMovieID)
+
+                                },
+                                horizontalAlignment = Alignment.CenterHorizontally){
+                                Icon(
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = "Watched Icon",
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                )
+                                Text("Remove from Watched")
+                            }
+                        }
+                        else
+                        {
+                            Column(modifier = Modifier
+                                .clickable {
+                                    appViewModel.addMovieToWatched(appUiState.currentMovieID, appUiState.currentMovieTitle, appUiState.currentMovieOverview, appUiState.currentMoviePosterPath)
+                                    appViewModel.checkMovieInWatched(appUiState.currentMovieID)
+                                },
+                                horizontalAlignment = Alignment.CenterHorizontally){
+                                Icon(
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = "Watched Icon",
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                )
+                                Text("Mark as Watched")
+                            }
                         }
 
+                        if(appUiState.movieInWatchlist){
                         Column(modifier = Modifier
                             .clickable {
-                                //TODO: DB FUNC TO ADD TO WATCHLIST ALSO CHECK IF ADDED
-                                //TODO: AND INSTEAD DISPLAY REMOVE FROM WATCHLIST
+                                appViewModel.removeMovieFromWatchlist(appUiState.currentMovieID)
+                                appViewModel.checkMovieInWatchlist(appUiState.currentMovieID)
                             },
                             horizontalAlignment = Alignment.CenterHorizontally){
                             Icon(
@@ -185,7 +207,24 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                                 contentDescription = "Watchlist Icon",
                                 tint = MaterialTheme.colorScheme.tertiary,
                             )
-                            Text("Add to Watchlist")
+                            Text("Remove from Watchlist")
+                        }
+                        }
+                        else
+                        {
+                            Column(modifier = Modifier
+                                .clickable {
+                                    appViewModel.addMovieToWatchlist(appUiState.currentMovieID, appUiState.currentMovieTitle, appUiState.currentMovieOverview, appUiState.currentMoviePosterPath)
+                                    appViewModel.checkMovieInWatchlist(appUiState.currentMovieID)
+                                },
+                                horizontalAlignment = Alignment.CenterHorizontally){
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Watchlist Icon",
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                )
+                                Text("Add to Watchlist")
+                            }
                         }
                     }
 
