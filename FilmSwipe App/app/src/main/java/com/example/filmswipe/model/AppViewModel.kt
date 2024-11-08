@@ -83,6 +83,14 @@ class AppViewModel: ViewModel() {
     private val _userSearchResults = MutableLiveData<List<FilmswipeUser>>()
     val userSearchResults: LiveData<List<FilmswipeUser>> = _userSearchResults
 
+    //Live data object for profile watchlist movies
+    private val _watchlistMovies = MutableLiveData<List<ProfileMovie>>()
+    val watchlistMovies: LiveData<List<ProfileMovie>> get() = _watchlistMovies
+
+    //Live data object for profile watched movies
+    private val _watchedMovies = MutableLiveData<List<ProfileMovie>>()
+    val watchedMovies: LiveData<List<ProfileMovie>> get() = _watchedMovies
+
 
 
     fun fetchPopularMovies() {
@@ -91,7 +99,7 @@ class AppViewModel: ViewModel() {
             try {
                 //API call with random page number
                 //TODO: TEST IF THIS IS A VALID RANGE
-                val pageNumber = Random.nextInt(1,10)
+                val pageNumber = Random.nextInt(1,100)
                 val response = RetrofitInstance.api.getPopularMovies(apiKey, pageNumber, _uiState.value.watchProviderFilter)
 
                 if (response.isSuccessful) {
@@ -398,7 +406,7 @@ class AppViewModel: ViewModel() {
         val movieDetails = mapOf(
             "title" to movie.title,
             "overview" to movie.overview,
-            "poster_url" to movie.poster_path,
+            "poster_path" to movie.poster_path,
         )
         //Gets path where to movie will be inserted
         val moviePath = db.collection("users")
@@ -421,7 +429,7 @@ class AppViewModel: ViewModel() {
         val movieDetails = mapOf(
             "title" to movie.title,
             "overview" to movie.overview,
-            "poster_url" to movie.poster_path,
+            "poster_path" to movie.poster_path,
         )
         //Gets path where to movie will be inserted
         val moviePath = db.collection("users")
@@ -558,6 +566,65 @@ class AppViewModel: ViewModel() {
             viewingWatchedMovies = false
         )
         }
+    }
+
+    fun usersWatchedMovies() {
+        //TODO: MODIFY SO USES ID OF CURRENTLY VIEWED PROFILE??
+        //Path to the users watchlisted movies
+        val watchlistRef = db.collection("users")
+            .document(_uiState.value.loggedInUID)
+            .collection("watchlist")
+
+        //Getting all results in this path
+        watchlistRef.get()
+            .addOnSuccessListener { queryResults ->
+
+                //toObjects simply maps the returned data to the
+                //same Movie data class used by returned API data
+                //uses class.java because of Firestore
+                val watchlistedMovies = queryResults.documents.mapNotNull { document ->
+                    val movie = document.toObject(ProfileMovie::class.java)
+                    movie?.copy(id = document.id)  //Grabbing document ID as it is movie ID
+                }
+                //Update live data for watchlist movies
+                _watchlistMovies.value = watchlistedMovies
+
+                Log.d("Success getting watchlist:", _watchlistMovies.value.toString())
+
+
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Error getting watchlist:", "Failed$exception")
+                _watchlistMovies.value = emptyList() //Set as empty on failure
+            }
+    }
+
+    fun usersWatchlistedMovies() {
+        //TODO: MODIFY SO USES ID OF CURRENTLY VIEWED PROFILE??
+        //Path to the users watchlisted movies
+        val watchedRef = db.collection("users")
+            .document(_uiState.value.loggedInUID)
+            .collection("watched")
+
+        //Getting all results in this path
+        watchedRef.get()
+            .addOnSuccessListener { queryResults ->
+
+                //toObjects simply maps the returned data to the
+                //same Movie data class used by returned API data
+                //uses class.java because of Firestore
+                val watchedMovies = queryResults.documents.mapNotNull { document ->
+                    val movie = document.toObject(ProfileMovie::class.java)
+                    movie?.copy(id = document.id)  //Grabbing document ID as it is movie ID
+                }
+                //Update live data for watchlist movies
+                _watchedMovies.value = watchedMovies
+
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Error getting watchlist:", "Failed$exception")
+                _watchedMovies.value = emptyList() //Set as empty on failure
+            }
     }
 
     //Settings page funcs

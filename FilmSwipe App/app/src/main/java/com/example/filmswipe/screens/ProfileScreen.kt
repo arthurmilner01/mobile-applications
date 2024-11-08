@@ -5,11 +5,19 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,20 +36,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.filmswipe.R
+import com.example.filmswipe.data.Movie
+import com.example.filmswipe.data.ProfileMovie
 import com.example.filmswipe.model.AppViewModel
 import kotlin.math.abs
 
 @Composable
 fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier){
+
+    val watchlistedMovies by appViewModel.watchlistMovies.observeAsState(emptyList())
+    val watchedMovies by appViewModel.watchedMovies.observeAsState(emptyList())
+    val appUiState by appViewModel.uiState.collectAsState()
+    val defaultProfilePic = painterResource(R.drawable.defaultprofilepic)
+
     LaunchedEffect(Unit){
         appViewModel.getScreenTitle(navController)
+        appViewModel.usersWatchlistedMovies()
+        appViewModel.usersWatchedMovies()
         //TODO: Run DB queries to return watchlist and watched films
+        //Function returns list of all movies added to watchlist
 
     }
 
-    val appUiState by appViewModel.uiState.collectAsState()
-    val defaultProfilePic = painterResource(R.drawable.defaultprofilepic)
 
 
     Column(
@@ -52,7 +71,7 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
             contentDescription = "App Logo",
             contentScale = ContentScale.Crop,
             modifier= Modifier
-                .padding(4.dp)
+                .padding(12.dp)
                 .size(120.dp)
                 .clip(CircleShape)
                 .border(
@@ -91,18 +110,67 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
             thickness = 1.dp,
             modifier = Modifier.padding(start=20.dp,end = 20.dp, bottom = 8.dp, top = 8.dp))
 
-        if(appUiState.viewingWatchedMovies){
-            //If user clicks liked movies label
-            //TODO: Add list of watched films here from db call
-            Text("Viewing Watched Movies")
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if(appUiState.viewingWatchedMovies){
+                //If user clicks liked movies label
+                //TODO: Add list of watched films here from db call
+                items(watchedMovies){ watchedMovie ->
+                    //For each movie place profile movie composable
+                    ProfileMovieCard(watchedMovie)
+
+                }
+            }
+            else
+            {
+                //If user has watchlist label selected
+                //TODO: Add list of watchlist films from db call
+                //For each watchlisted movie
+                items(watchlistedMovies){ watchlistedMovie ->
+                    //For each movie place profile movie composable
+                    ProfileMovieCard(watchlistedMovie)
+
+                }
+
+            }
+        }
+
+
+    }
+}
+
+@Composable
+fun ProfileMovieCard(profileMovie: ProfileMovie){
+    //TODO: Make clickable to display movie details
+    val ifNotPoster = painterResource(R.drawable.defaultprofilepic)
+    val imageUrl = "https://image.tmdb.org/t/p/w500${profileMovie.poster_path ?: ""}"
+    Box(
+        modifier = Modifier
+            .padding(12.dp)
+    ){
+        if (!profileMovie.poster_path.isNullOrEmpty()){
+            Image(
+                painter = rememberAsyncImagePainter(imageUrl),
+                contentDescription = null,
+                modifier = Modifier
+                    .height(150.dp)
+                    .width(100.dp),
+                contentScale = ContentScale.Crop
+            )
         }
         else
         {
-            //If user has watchlist label selected
-            //TODO: Add list of watchlist films from db call
-            Text("Viewing Watchlist")
+            Image(
+                painter = ifNotPoster,
+                contentDescription = null,
+                modifier = Modifier
+                    .height(150.dp)
+                    .width(100.dp),
+                contentScale = ContentScale.Crop
+            )
         }
-
 
     }
 }
