@@ -533,12 +533,14 @@ class AppViewModel: ViewModel() {
 
     }
 
+    //https://inorganik.medium.com/implementing-a-simple-effective-search-in-firebase-with-just-firestore-957dd716ccdb
+    //Reference for string matching with firebase
     fun performUserSearch() {
         val currentQuery = searchText
         db.collection("users")
             //Search usernames
             .whereGreaterThanOrEqualTo("username", currentQuery)
-            .whereLessThanOrEqualTo("username", currentQuery)
+            .whereLessThanOrEqualTo("username", currentQuery + '\uf8ff')
             .whereNotEqualTo("username", _uiState.value.loggedInUsername)
             .get()
             .addOnSuccessListener { queryResults ->
