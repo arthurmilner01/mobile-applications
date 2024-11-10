@@ -1,54 +1,56 @@
 package com.example.filmswipe.screens
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import android.util.Base64
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
 import com.example.filmswipe.R
 import com.example.filmswipe.data.FilmswipeUser
 import com.example.filmswipe.data.Movie
 import com.example.filmswipe.data.ProfileMovie
 import com.example.filmswipe.model.AppViewModel
+import java.io.ByteArrayOutputStream
 import kotlin.math.abs
+
 
 @Composable
 fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier, email: String? = null){
+
+    val context = LocalContext.current
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+
     val userEmail = email ?: appViewModel.uiState.collectAsState().value.loggedInEmail
     var userProfile by remember { mutableStateOf<FilmswipeUser?>(null) }
 
@@ -57,11 +59,46 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
     val appUiState by appViewModel.uiState.collectAsState()
     val defaultProfilePic = painterResource(R.drawable.defaultprofilepic)
 
+
+
+    val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            imageUri = result.uriContent
+        } else {
+            val exception = result.error
+        }
+    }
+
+
+
+    if (imageUri != null) {
+        if (Build.VERSION.SDK_INT < 28) {
+            bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+        } else {
+            val source = ImageDecoder.createSource(context.contentResolver, imageUri!!)
+            bitmap = ImageDecoder.decodeBitmap(source)
+        }
+
+        //Convert bitmap to Base64 string
+        bitmap?.let {
+            val base64String = appViewModel.convertBitmapToBase64(it)
+            userProfile?.let { profile ->
+                appViewModel.updateUserProfilePicture(userEmail, base64String)
+                profile.profile_picture = base64String
+            }
+        }
+    }
+
+
+
     LaunchedEffect(userEmail) {
         if(userProfile == null){
             appViewModel.getScreenTitle(navController)
             appViewModel.fetchUserProfileByEmail(userEmail) { user ->
                 userProfile = user
+                if (user?.profile_picture != null) {
+                    bitmap = appViewModel.convertBase64ToBitmap(user.profile_picture!!)
+                }
             }
             //Functions which update watchlistedMovies and watchedMovies
             appViewModel.usersWatchlistedMovies(userEmail)
@@ -77,19 +114,62 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        Image(painter=defaultProfilePic, //TODO: IF Statement checking if logged user has pfp
-            contentDescription = "App Logo",
-            contentScale = ContentScale.Crop,
-            modifier= Modifier
-                .padding(12.dp)
-                .size(120.dp)
-                .clip(CircleShape)
-                .border(
-                    BorderStroke(4.dp, MaterialTheme.colorScheme.onBackground),
-                    CircleShape
-                )
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap!!.asImageBitmap(),
+                contentDescription = "Profile Picture",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .padding(12.dp)
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .border(
+                        BorderStroke(4.dp, MaterialTheme.colorScheme.onBackground),
+                        CircleShape
+                    )
+                    .clickable {
+                        if (userEmail == appUiState.loggedInEmail) {
+                            imageUri = null
+                            imageCropLauncher.launch(
+                                CropImageContractOptions(
+                                    null,
+                                    CropImageOptions()
+                                )
+                            )
+                        }
+                    }
+            )
+        } else {
+            Image(
+                painter = if (userProfile?.profile_picture != null) {
+                    rememberAsyncImagePainter(userProfile!!.profile_picture)
+                } else {
+                    painterResource(id = R.drawable.defaultprofilepic)
+                },
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .padding(12.dp)
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .border(
+                        BorderStroke(4.dp, MaterialTheme.colorScheme.onBackground),
+                        CircleShape
+                    )
+                    .clickable {
+                        if (userEmail == appUiState.loggedInEmail) {
+                            imageUri = null
+                            imageCropLauncher.launch(
+                                CropImageContractOptions(
+                                    null,
+                                    CropImageOptions()
+                                )
+                            )
+                        }
+                    }
+            )
+        }
 
-        )
+
         Text(
             text = userProfile?.username ?: "Loading...",
             modifier = modifier

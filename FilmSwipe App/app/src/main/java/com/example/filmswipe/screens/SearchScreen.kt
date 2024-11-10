@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -192,6 +193,10 @@ fun UserItem(filmswipeUser: FilmswipeUser, navController: NavController, appView
     val profilePicture = filmswipeUser.profile_picture
     val defaultProfilePic = painterResource(R.drawable.defaultprofilepic)
 
+    val bitmap = remember {
+        profilePicture?.let { appViewModel.convertBase64ToBitmap(it) }
+    }
+
     Row(
         modifier = Modifier
             .padding(4.dp)
@@ -205,10 +210,9 @@ fun UserItem(filmswipeUser: FilmswipeUser, navController: NavController, appView
             .clip(RoundedCornerShape(8.dp)),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        //TODO: Show user profile image
-        if(filmswipeUser.profile_picture != null){
+        if (bitmap != null) {
             Image(
-                painter = rememberAsyncImagePainter(profilePicture),
+                bitmap = bitmap.asImageBitmap(),
                 contentDescription = null,
                 modifier = Modifier
                     .height(75.dp)
