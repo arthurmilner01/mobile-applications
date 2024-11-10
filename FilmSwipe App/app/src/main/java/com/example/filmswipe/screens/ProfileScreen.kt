@@ -27,6 +27,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,24 +41,33 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.filmswipe.R
+import com.example.filmswipe.data.FilmswipeUser
 import com.example.filmswipe.data.Movie
 import com.example.filmswipe.data.ProfileMovie
 import com.example.filmswipe.model.AppViewModel
 import kotlin.math.abs
 
 @Composable
-fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier){
+fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier, email: String? = null){
+    val userEmail = email ?: appViewModel.uiState.collectAsState().value.loggedInEmail
+    var userProfile by remember { mutableStateOf<FilmswipeUser?>(null) }
 
     val watchlistedMovies by appViewModel.watchlistMovies.observeAsState(emptyList())
     val watchedMovies by appViewModel.watchedMovies.observeAsState(emptyList())
     val appUiState by appViewModel.uiState.collectAsState()
     val defaultProfilePic = painterResource(R.drawable.defaultprofilepic)
 
-    LaunchedEffect(Unit){
-        appViewModel.getScreenTitle(navController)
-        //Functions which update watchlistedMovies and watchedMovies
-        appViewModel.usersWatchlistedMovies()
-        appViewModel.usersWatchedMovies()
+    LaunchedEffect(userEmail) {
+        if(userProfile == null){
+            appViewModel.getScreenTitle(navController)
+            appViewModel.fetchUserProfileByEmail(userEmail) { user ->
+                userProfile = user
+            }
+            //Functions which update watchlistedMovies and watchedMovies
+            appViewModel.usersWatchlistedMovies(userEmail)
+            appViewModel.usersWatchedMovies(userEmail)
+        }
+
     }
 
 
@@ -79,7 +91,7 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
 
         )
         Text(
-            text = stringResource(R.string.profile_name, appUiState.loggedInUsername),
+            text = userProfile?.username ?: "Loading...",
             modifier = modifier
                 .padding(bottom = 12.dp),
             style= MaterialTheme.typography.titleLarge
@@ -139,7 +151,6 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
 
 @Composable
 fun ProfileMovieCard(profileMovie: ProfileMovie, appViewModel: AppViewModel, navController: NavController){
-    //TODO: Make clickable to display movie details
     val ifNotPoster = painterResource(R.drawable.defaultprofilepic)
     val imageUrl = "https://image.tmdb.org/t/p/w500${profileMovie.poster_path ?: ""}"
     Box(

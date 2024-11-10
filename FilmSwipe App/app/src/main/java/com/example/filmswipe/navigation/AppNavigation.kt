@@ -34,6 +34,10 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
         { LoginScreen(navController, appViewModel, modifier) }
         composable("signupscreen") { SignUpScreen(navController, appViewModel, modifier) }
         composable("homescreen") { HomeScreen(navController, appViewModel, modifier) }
+        composable("profilescreen/{email}") { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email")
+            ProfileScreen(navController, appViewModel, modifier, email)
+        }
         composable("profilescreen") { ProfileScreen(navController, appViewModel, modifier) }
         composable("settingsscreen") { SettingsScreen(navController, appViewModel, modifier) }
         composable("searchscreen") { SearchScreen(navController, appViewModel, modifier) }

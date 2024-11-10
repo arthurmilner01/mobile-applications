@@ -198,7 +198,7 @@ fun UserItem(filmswipeUser: FilmswipeUser, navController: NavController, appView
             .fillMaxWidth()
             .height(75.dp)
             .clickable {
-                //TODO: Navigate to users profile
+                navController.navigate("profilescreen/${filmswipeUser.email}")
             }
             .border(1.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.surface)

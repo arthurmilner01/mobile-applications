@@ -568,62 +568,99 @@ class AppViewModel: ViewModel() {
         }
     }
 
-    fun usersWatchedMovies() {
-        //TODO: MODIFY SO USES ID OF CURRENTLY VIEWED PROFILE??
-        //Path to the users watchlisted movies
-        val watchlistRef = db.collection("users")
-            .document(_uiState.value.loggedInUID)
-            .collection("watchlist")
-
-        //Getting all results in this path
-        watchlistRef.get()
+    fun fetchUserProfileByEmail(email: String, callback: (FilmswipeUser?) -> Unit) {
+        db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
             .addOnSuccessListener { queryResults ->
-
-                //toObjects simply maps the returned data to the
-                //same Movie data class used by returned API data
-                //uses class.java because of Firestore
-                val watchlistedMovies = queryResults.documents.mapNotNull { document ->
-                    val movie = document.toObject(ProfileMovie::class.java)
-                    movie?.copy(id = document.id)  //Grabbing document ID as it is movie ID
+                if (!queryResults.isEmpty) {
+                    val document = queryResults.documents[0]
+                    val username = document.getString("username") ?: "Unknown User"
+                    val profilePicture = document.getString("profile_picture")
+                    val user = FilmswipeUser(username, profilePicture, email)
+                    callback(user)
+                } else {
+                    callback(null)
                 }
-                //Update live data for watchlist movies
-                _watchlistMovies.value = watchlistedMovies
-
-                Log.d("Success getting watchlist:", _watchlistMovies.value.toString())
-
-
             }
             .addOnFailureListener { exception ->
-                Log.d("Error getting watchlist:", "Failed$exception")
-                _watchlistMovies.value = emptyList() //Set as empty on failure
+                Log.d("fetchUserProfileByEmail", "Failed to retrieve user: ${exception.message}")
+                callback(null)
             }
     }
 
-    fun usersWatchlistedMovies() {
-        //TODO: MODIFY SO USES ID OF CURRENTLY VIEWED PROFILE??
-        //Path to the users watchlisted movies
-        val watchedRef = db.collection("users")
-            .document(_uiState.value.loggedInUID)
-            .collection("watched")
 
-        //Getting all results in this path
-        watchedRef.get()
+
+    fun usersWatchedMovies(email: String) {
+        //Path to the users watched movies
+        db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
             .addOnSuccessListener { queryResults ->
+                if (!queryResults.isEmpty) {
+                    val document = queryResults.documents[0]
+                    val userId = document.id
 
-                //toObjects simply maps the returned data to the
-                //same Movie data class used by returned API data
-                //uses class.java because of Firestore
-                val watchedMovies = queryResults.documents.mapNotNull { document ->
-                    val movie = document.toObject(ProfileMovie::class.java)
-                    movie?.copy(id = document.id)  //Grabbing document ID as it is movie ID
+                    val watchedRef = db.collection("users")
+                        .document(userId)
+                        .collection("watched")
+
+                    watchedRef.get()
+                        .addOnSuccessListener { watchedResults ->
+                            //toObjects simply maps the returned data to the
+                            //same Movie data class used by returned API data
+                            //uses class.java because of Firestore
+                            val watchedMovies = watchedResults.documents.mapNotNull { doc ->
+                                val movie = doc.toObject(ProfileMovie::class.java)
+                                movie?.copy(id = doc.id) //Assign the movie ID from document ID
+                            }
+                            _watchedMovies.value = watchedMovies
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.d("Error getting watched movies:", "Failed$exception")
+                            _watchedMovies.value = emptyList() //Set empty on failure
+                        }
                 }
-                //Update live data for watchlist movies
-                _watchedMovies.value = watchedMovies
-
             }
             .addOnFailureListener { exception ->
-                Log.d("Error getting watchlist:", "Failed$exception")
-                _watchedMovies.value = emptyList() //Set as empty on failure
+                Log.d("Error finding user:", "Failed$exception")
+            }
+    }
+
+
+    fun usersWatchlistedMovies(email: String) {
+        //Path to the users watched movies
+        db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { queryResults ->
+                if (!queryResults.isEmpty) {
+                    val document = queryResults.documents[0]
+                    val userId = document.id
+
+                    val watchlistRef = db.collection("users")
+                        .document(userId)
+                        .collection("watchlist")
+
+                    watchlistRef.get()
+                        .addOnSuccessListener { watchlistResults ->
+                            //toObjects simply maps the returned data to the
+                            //same Movie data class used by returned API data
+                            //uses class.java because of Firestore
+                            val watchlistedMovies = watchlistResults.documents.mapNotNull { doc ->
+                                val movie = doc.toObject(ProfileMovie::class.java)
+                                movie?.copy(id = doc.id) //Assign the movie ID from document ID
+                            }
+                            _watchlistMovies.value = watchlistedMovies
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.d("Error getting watchlist:", "Failed$exception")
+                            _watchlistMovies.value = emptyList() //Set empty on failure
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("Error finding user:", "Failed$exception")
             }
     }
 
@@ -765,9 +802,10 @@ class AppViewModel: ViewModel() {
                     //Grab current users username and profile picture
                     val username = document.getString("username")
                     val profilePicture = document.getString("profile_picture")
+                    val email = document.getString("email")
                     //Creating filmswipe user object
-                    if (username != null) {
-                        val filmswipeUser = FilmswipeUser(username, profilePicture)
+                    if (username != null && email != null) {
+                        val filmswipeUser = FilmswipeUser(username, profilePicture, email)
                         users.add(filmswipeUser) //Add to users list
                     }
                 }
