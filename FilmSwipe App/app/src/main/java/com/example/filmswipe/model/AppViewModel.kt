@@ -1,5 +1,8 @@
 package com.example.filmswipe.model
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -22,6 +25,7 @@ import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
+import java.io.ByteArrayOutputStream
 import kotlin.random.Random
 
 class AppViewModel: ViewModel() {
@@ -589,6 +593,47 @@ class AppViewModel: ViewModel() {
             }
     }
 
+    //https://stackoverflow.com/questions/9224056/android-bitmap-to-base64-string
+    fun convertBitmapToBase64(bitmap: Bitmap): String {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+    //https://stackoverflow.com/questions/4837110/how-to-convert-a-base64-string-into-a-bitmap-image-to-show-it-in-a-imageview
+    fun convertBase64ToBitmap(base64Str: String): Bitmap? {
+        return try {
+            val decodedBytes = Base64.decode(base64Str, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+    }
+
+    fun updateUserProfilePicture(email: String, base64String: String) {
+        db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { queryResults ->
+                if (!queryResults.isEmpty) {
+                    val document = queryResults.documents[0]
+                    val userId = document.id
+
+                    // Update the profile picture in the Firestore document
+                    db.collection("users").document(userId)
+                        .update("profile_picture", base64String)
+                        .addOnSuccessListener {
+                            Log.d("updateUserProfilePicture", "Profile picture updated successfully")
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.d("updateUserProfilePicture", "Failed to update profile picture: ${exception.message}")
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("updateUserProfilePicture", "Failed to find user: ${exception.message}")
+            }
+    }
 
 
     fun usersWatchedMovies(email: String) {
