@@ -825,9 +825,6 @@ class AppViewModel: ViewModel() {
 
     }
 
-    //TODO: Reference this
-    //https://inorganik.medium.com/implementing-a-simple-effective-search-in-firebase-with-just-firestore-957dd716ccdb
-    //Reference for string matching with firebase
     fun performUserSearch() {
         val currentQuery = searchText
         db.collection("users")

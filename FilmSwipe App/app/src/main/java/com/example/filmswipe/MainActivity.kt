@@ -81,6 +81,19 @@ import com.google.android.gms.wallet.button.ButtonConstants
 import com.example.filmswipe.screens.*
 import com.example.filmswipe.navigation.*
 
+//Bibliography:
+//TODO: Format correctly
+//For API
+//https://medium.com/@kathankraithatha/how-to-use-api-in-jetpack-compose-10d11b8f166f
+//API reference
+//https://developer.themoviedb.org/v4/reference/intro/getting-started
+////Reference for string matching with firebase
+//https://inorganik.medium.com/implementing-a-simple-effective-search-in-firebase-with-just-firestore-957dd716ccdb
+//For firebase authentication/user login/logoff/sign-up, we adapted this to kotlin
+//https://firebase.flutter.dev/docs/auth/usage/
+
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,27 +114,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AppPreview() {
-    val navController = rememberNavController()
-    val appViewModel: AppViewModel = viewModel()
-
-    FilmSwipeTheme(navController=navController, appViewModel = appViewModel){
-        Scaffold(modifier = Modifier.fillMaxSize(),
-            topBar = { TopNavigationBar(navController, appViewModel)},
-            bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
-            Box(modifier=Modifier.padding(innerPadding)) {
-                AppNavigator(
-                    modifier = Modifier.padding(8.dp),
-                    navController = navController,
-                    appViewModel = appViewModel
-                )
             }
         }
     }
