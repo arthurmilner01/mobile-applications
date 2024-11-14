@@ -85,12 +85,19 @@ import com.example.filmswipe.navigation.*
 //TODO: Format correctly
 //For API
 //https://medium.com/@kathankraithatha/how-to-use-api-in-jetpack-compose-10d11b8f166f
+
 //API reference
 //https://developer.themoviedb.org/v4/reference/intro/getting-started
-////Reference for string matching with firebase
+
+//Reference for string matching with firebase
 //https://inorganik.medium.com/implementing-a-simple-effective-search-in-firebase-with-just-firestore-957dd716ccdb
+
 //For firebase authentication/user login/logoff/sign-up, we adapted this to kotlin
 //https://firebase.flutter.dev/docs/auth/usage/
+
+//For using device camera
+//https://www.youtube.com/watch?v=s1WXrB9fv8Q
+//https://www.youtube.com/watch?v=UqNnpt3OfhE
 
 
 
