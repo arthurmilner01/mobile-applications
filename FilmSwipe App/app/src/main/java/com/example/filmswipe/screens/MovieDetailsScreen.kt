@@ -51,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -202,9 +203,20 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = appUiState.currentMovieGenres.joinToString(", "),
-                            style = MaterialTheme.typography.bodyLarge
+                            text = if (appUiState.currentMovieGenres.isNotEmpty()) {
+                                appUiState.currentMovieGenres.joinToString(", ")
+                            } else {
+                                "No genres available"
+                            },
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = if (appUiState.currentMovieGenres.isNotEmpty()) {
+                                    MaterialTheme.colorScheme.onBackground
+                                } else {
+                                    MaterialTheme.colorScheme.error
+                                }
+                            )
                         )
+
                     }
                 }
             }
@@ -388,13 +400,41 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
 
                 else -> {
                     if(appUiState.viewingMovieCrew){
-                        items(crew) { crewMember ->
-                            CrewMemberListItem(crewMember)
+                        if (crew.isEmpty()) {
+                            item {
+                                Text(
+                                    text = "No crew available",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        } else {
+                            items(crew) { crewMember ->
+                                CrewMemberListItem(crewMember)
+                            }
                         }
                     }
-                    else{
-                        items(cast) { castMember ->
-                            CastMemberListItem(castMember)
+                    else {
+                        if (cast.isEmpty()) {
+                            item {
+                                Text(
+                                    text = "No cast available",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        } else {
+                            items(cast) { castMember ->
+                                CastMemberListItem(castMember)
+                            }
                         }
                     }
                 }
