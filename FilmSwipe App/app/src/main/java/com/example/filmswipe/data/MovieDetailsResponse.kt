@@ -1,5 +1,5 @@
 package com.example.filmswipe.data
-
+//TODO: Comment
 data class MovieDetailsResponse(
     val genres: List<Genre>,
     val imdb_id: String?,

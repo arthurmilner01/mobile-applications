@@ -23,18 +23,24 @@ import com.example.filmswipe.model.AppViewModel
 @Composable
 fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel){
     val appUiState by appViewModel.uiState.collectAsState()
+    //Labels for bottom nav icons
     val items = listOf("Home", "Search", "Profile","Settings")
+    //Icons to display when user is on the specific page
     val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Person, Icons.Filled.Settings)
+    //Icons to display when user is not on the specific page
     val unselectedIcons = listOf(Icons.Outlined.Home, Icons.Outlined.Search, Icons.Outlined.Person, Icons.Outlined.Settings)
 
+    //If user is logged in and not changing their password display top nav
     if(appUiState.isLoggedIn && !appUiState.viewingChangePassword){
         NavigationBar(
             containerColor = MaterialTheme.colorScheme.surface
         ){
+            //For each icon
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
                     icon = {
                         Icon(
+                            //If navigated to specific page show icon as selected
                             if (appUiState.navSelectedItem == index) selectedIcons[index] else unselectedIcons[index],
                             contentDescription = item
                         )
@@ -45,9 +51,12 @@ fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel
                         style= MaterialTheme.typography.labelSmall
                     )
                     },
+                    //Further styling when selected
                     selected = index == appUiState.navSelectedItem,
                     onClick = {
+                        //When bottom nav is used change currently selected icon
                         appViewModel.changeNavSelectedItem(index)
+                        //Navigate to the screen of the icon selected
                         navController.navigate(route = item.plus("screen"))
                     }
                 )

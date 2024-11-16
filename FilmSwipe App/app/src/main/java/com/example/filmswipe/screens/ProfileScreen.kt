@@ -45,18 +45,22 @@ import kotlin.math.abs
 
 @Composable
 fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier, email: String? = null){
-
+    //For the use of the camera
     val context = LocalContext.current
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
 
     val userEmail = email ?: appViewModel.uiState.collectAsState().value.loggedInEmail
-    var userProfile by remember { mutableStateOf<FilmswipeUser?>(null) }
 
+    //Observe live data for user profile
+    var userProfile by remember { mutableStateOf<FilmswipeUser?>(null) }
+    //Observe live data for watchlisted/watched movies
     val watchlistedMovies by appViewModel.watchlistMovies.observeAsState(emptyList())
     val watchedMovies by appViewModel.watchedMovies.observeAsState(emptyList())
+
     val appUiState by appViewModel.uiState.collectAsState()
+    //Fallback image if user has not profile picture
     val defaultProfilePic = painterResource(R.drawable.defaultprofilepic)
 
 
@@ -93,6 +97,7 @@ fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modi
 
     LaunchedEffect(userEmail) {
         if(userProfile == null){
+            //Get screen title for top nav
             appViewModel.getScreenTitle(navController)
             appViewModel.fetchUserProfileByEmail(userEmail) { user ->
                 userProfile = user

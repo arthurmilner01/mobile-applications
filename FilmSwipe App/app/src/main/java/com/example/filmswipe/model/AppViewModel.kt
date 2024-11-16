@@ -12,21 +12,27 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.example.filmswipe.data.*
-import com.example.filmswipe.network.*
+import com.example.filmswipe.data.CastMember
+import com.example.filmswipe.data.CrewMember
+import com.example.filmswipe.data.FilmswipeUser
+import com.example.filmswipe.data.Movie
+import com.example.filmswipe.data.ProfileMovie
+import com.example.filmswipe.network.RetrofitInstance
 import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.firestore
 import java.io.ByteArrayOutputStream
 import kotlin.random.Random
 
 class AppViewModel: ViewModel() {
+    //TODO: Comment and see if can be split to multiple files
+
     private val _uiState = MutableStateFlow(AppUiState())
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
 

@@ -3,6 +3,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
+    //Creates instance of API
     private const val BASE_URL = "https://api.themoviedb.org/3/"
 
     val api: TMDBAPIService by lazy {

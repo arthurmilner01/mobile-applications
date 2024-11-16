@@ -9,15 +9,27 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -27,25 +39,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.example.filmswipe.R
 import com.example.filmswipe.model.AppViewModel
 import kotlin.math.abs
 
 @Composable
 fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     val appUiState by appViewModel.uiState.collectAsState()
+    //Observing live data for movies
     val movies by appViewModel.movies.observeAsState(emptyList())
+    //For when API call is loading
     val loading by appViewModel.loading.observeAsState(initial = false)
+    //For when API call errors
     val error by appViewModel.error.observeAsState(initial = null)
 
     LaunchedEffect(Unit){
+        //Get screen title for top nav
         appViewModel.getScreenTitle(navController)
+        //If there are no movies to swipe fetch more movies
         if (movies.isEmpty()) {
             appViewModel.fetchPopularMovies()
         }
@@ -57,24 +71,29 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
             .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {
+        //Loading icon if API not yet responded
         if(loading){
-            CircularProgressIndicator() //Loading icon if API not yet responded
+            CircularProgressIndicator()
         }
-        else if(error != null){ //If error in loading films display this
+        //If error in loading films display this
+        else if(error != null){
             Column {
                 Text(text = "Error loading movies please try again.")
+                //Button to try fetch movies again
                 Button(onClick = { appViewModel.fetchPopularMovies() }) {
                     Text(text = "Reload")
                 }
             }
         }
-        else{ //If API call is successful
+        else{
+            //If API call is successful
+            //For each movie in movies, reversed as makes it easier to work with
             for (index in movies.indices.reversed()) {
-                //TODO: DB call to check film not already in watchlist/watched for user
-                //TODO: Also if isLastMovie must handle this
-                //Checking if last film
-                val isLastMovie = index == movies.size - 1
+                //TODO: LOOK AT THIS TO SEE ABOUT FIXING THE REFRESH ISSUE
 
+                //Checking if last movie in movies
+                val isLastMovie = index == movies.size - 1
+                //Check if current movie is in users watchlist/watched
                 appViewModel.checkMovieInWatchlist(movieID = movies[index].id)
                 appViewModel.checkMovieInWatched(movieID = movies[index].id)
 
@@ -82,12 +101,17 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                 //and remove from list
                 if(appUiState.movieInWatched || appUiState.movieInWatchlist){
                     appViewModel.removeMovie(index)
+                    //TODO: CHANGE HOW THIS WORKS AS I THINK THIS IS CAUSE OF REFRESH??
+                    //If the last movie has already been seen/watched fetch more movies
+                    //as wont be able to apply this login to the swipable card swipe
+                    //functions
                     if(isLastMovie) {
                         appViewModel.fetchPopularMovies()
                     }
                 }
                 else
                 {
+                    //Creates swipable card from current movie if not already in watched or watchlist
                     SwipableCard(
                         navController = navController,
                         movieId = movies[index].id,
@@ -96,23 +120,32 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                         filmImage = movies[index].poster_path,
                         voteAverage =  movies[index].vote_average,
                         onSwipeLeft = {
+                            //When movie is swiped left remove it from the movie list
                             appViewModel.removeMovie(index)
+                            //If this is the last movie fetch more movies
                             if(isLastMovie) {
                                 appViewModel.fetchPopularMovies()
                             } },
                         onSwipeRight = {
+                            //When movie is swiped right add movie to watchlist
                             appViewModel.addMovieToWatchlist(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
+                            //Remove movie from movie list
                             appViewModel.removeMovie(index)
+                            //If this is the last movie fetch more movies
                             if(isLastMovie) {
                                 appViewModel.fetchPopularMovies()
                             } },
                         onSwipeUp = {
+                            //When movie is swiped up add movie to watched
                             appViewModel.addMovieToWatched(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
+                            //Remove movie from movie list
                             appViewModel.removeMovie(index)
+                            //If this is the last movie fetch more movies
                             if(isLastMovie){
                                 appViewModel.fetchPopularMovies()
                             }}
                     )
+                    //Update UI state to details of the currently displayed movie
                     appViewModel.getCurrentMovie(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
                 }
             }
@@ -138,17 +171,19 @@ fun SwipableCard(
     var offsetY by remember { mutableStateOf(0f) }
     //State to track whether the card is currently being swiped
     var isSwiping by remember { mutableStateOf(false) }
-    //How far user must swipe to register either left, right, up or down
+    //How far user must swipe to trigger either left, right or up swipe functions
     val swipeThreshold = 175f
     //States for handling smooth animation if swipe doesn't go past threshold
+    //so card returns to initial position
     val animatedOffsetX by animateFloatAsState(targetValue = offsetX)
     val animatedOffsetY by animateFloatAsState(targetValue = offsetY)
     //Using offsetX to slightly rotate the card on left/right swipe
     val rotationAngle = offsetX * 0.02f
-    //Using offsetX to slowly fade out card as user swipes
+    //Using offsetX to slowly fade out card as user swipes further from
+    //initial position
     val cardAlpha = if(isSwiping) 1f - ((abs(offsetX) / (swipeThreshold*2))) else 1f
 
-    //Sets border colour depending on swipe type
+    //Sets border colour to indicate type of swipe
     val borderColor = when {
         offsetY < -swipeThreshold / 2 -> Color.Blue.copy(alpha = cardAlpha) //Always blue if card past Y threshold / 2
         offsetX > swipeThreshold / 2 -> Color.Green.copy(alpha = cardAlpha)  //Right
@@ -156,6 +191,7 @@ fun SwipableCard(
         else -> MaterialTheme.colorScheme.surface                            //Neutral
     }
 
+    //Changes the colour of the rating depending on how high/low
     val ratingBackgroundColor = when {
         voteAverage >= 8.0 -> Color(0xFF4CC452) //Green for high ratings
         voteAverage >= 5.0 -> Color(0xFFDCA60D) //Yellow for medium ratings
@@ -172,7 +208,10 @@ fun SwipableCard(
             .offset(x = animatedOffsetX.dp, y= animatedOffsetY.dp)
             .rotate(rotationAngle)  //Rotates card based on rotation angle
             .border(BorderStroke(4.dp, borderColor), RoundedCornerShape(8.dp))
-            .clickable { navController.navigate("moviedetailsscreen") }
+            .clickable {
+                //On click will navigate to show movies full details
+                navController.navigate("moviedetailsscreen")
+            }
     ){
         Card(
             modifier = Modifier
@@ -188,6 +227,7 @@ fun SwipableCard(
                     .pointerInput(Unit) { //Handling swiping
                         detectDragGestures(
                             onDragStart = {
+                                //State to track if user is swiping
                                 isSwiping = true
                             },
                             onDrag = { change, dragAmount ->
@@ -195,6 +235,7 @@ fun SwipableCard(
                                 offsetX += dragAmount.x //Tracking amount of drag on X
 
                                 //Allows down swipe but not beyond initial offset.y
+                                //so card cannot be down swiped
                                 val minOffsetY = offsetY + dragAmount.y
                                 if (minOffsetY <= 0) {
                                     offsetY = minOffsetY
@@ -206,18 +247,20 @@ fun SwipableCard(
                                 if(abs(offsetY) > swipeThreshold){
                                     onSwipeUp()
                                 }
+                                //Absolute value here as looking at both left/right
                                 else if(abs(offsetX) > swipeThreshold) {
                                     //If negative then must be left swipe else right
                                     if (offsetX < 0) onSwipeLeft() else onSwipeRight()
                                 }
-                                // Reset position and swiping state
+                                //Reset card position and swiping state
                                 offsetX = 0f
                                 offsetY = 0f
                                 isSwiping = false
                             },
                             onDragCancel = {
-                                //Resets position
+                                //Resets position of card
                                 offsetX = 0f
+                                //Reset swiping state
                                 isSwiping = false
                             }
                         )
@@ -237,8 +280,8 @@ fun SwipableCard(
                         .align(Alignment.TopEnd)
                         .padding(13.dp)
                         .clickable{
+                            //TODO: Cite source from bibliography about links in browser
                             val tmdbUrl = "https://www.themoviedb.org/movie/${movieId}"
-                            //https://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(tmdbUrl))
                             context.startActivity(intent)
                         }

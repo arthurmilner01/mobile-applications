@@ -35,7 +35,7 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
     val appUiState by appViewModel.uiState.collectAsState()
 
 
-
+    //If user is logged in display top nav
     if(appUiState.isLoggedIn){
         appViewModel.getScreenTitle(navController)
         TopAppBar(
@@ -46,6 +46,7 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
+                        //If on home or changing password do not display a title
                         text = if(appUiState.viewingHome || appUiState.viewingChangePassword){ "" } else{ appUiState.navScreenTitle},
                         color = MaterialTheme.colorScheme.tertiary,
                         style = MaterialTheme.typography.titleLarge.copy(
@@ -56,9 +57,12 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                 }
             },
             navigationIcon = {
-                // Display back arrow only if viewingMovieDetails is true
-                if (appUiState.viewingMovieDetails) {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                //Display back arrow only if viewing movie details or changing password
+                if (appUiState.viewingMovieDetails || appUiState.viewingChangePassword) {
+                    IconButton(onClick = {
+                        //Goes to previous screen
+                        navController.popBackStack()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
@@ -66,17 +70,11 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                         )
                     }
                 }
-                if (appUiState.viewingChangePassword) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.tertiary
-                        )
-                    }
-                }
+
+                //If viewing home
                 if (appUiState.viewingHome) {
                     IconButton(
+                        //Update UI state to display filter menu
                         onClick = { appViewModel.expandFilterMenu() },
                     ) {
                         Icon(
@@ -85,8 +83,11 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                             tint = MaterialTheme.colorScheme.tertiary
                         )
                     }
+                    //Streaming service ID's 8 = Netflix, 337 = Disney+, 9 = Prime
                     DropdownMenu(
+                        //Expanded when filterMenuExpanded is true
                         expanded = appUiState.filterMenuExpanded,
+                        //Minimises streaming filter menu/sets filterMenuExpanded to false
                         onDismissRequest = { appViewModel.dismissFilterMenu() }
                     ) {
                         Text(text="Filter by Streaming Service:",
@@ -97,19 +98,25 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                             text = {
                                 Row{
                                     Text("Disney+")
+                                    //Updates switch appearance
                                     Switch(checked = appUiState.disneyFilter,
                                         onCheckedChange = null)
                                 }},
-                            //8 = Netflix, 337 = Disney+, 119 = Prime
                             onClick = {
                                 if(appUiState.disneyFilter){
+                                    //Removes disney filter
                                     appViewModel.removeStreamingFilter("337")
+                                    //Set disney filter to false
                                     appViewModel.setDisneyFilter()
+                                    //Fetches new filtered movies to display on home
                                     appViewModel.fetchPopularMovies()
                                 }
                                 else{
+                                    //Add disney filter
                                     appViewModel.addStreamingFilter("337")
+                                    //Set disney filter to true
                                     appViewModel.setDisneyFilter()
+                                    //Fetches new filtered movies to display on home
                                     appViewModel.fetchPopularMovies()
                                 }
                             }
@@ -118,18 +125,25 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                             text = {
                                 Row{
                                     Text("Amazon Prime")
+                                    //Updates switch appearance
                                     Switch(checked = appUiState.primeFilter,
                                         onCheckedChange = null)
                             }},
                             onClick = {
                                 if(appUiState.primeFilter){
+                                    //Removes prime filter
                                     appViewModel.removeStreamingFilter("9")
+                                    //Set prime filter to false
                                     appViewModel.setPrimeFilter()
+                                    //Fetches new filtered movies to display on home
                                     appViewModel.fetchPopularMovies()
                                 }
                                 else{
+                                    //Add prime filter
                                     appViewModel.addStreamingFilter("9")
+                                    //Set prime filter to true
                                     appViewModel.setPrimeFilter()
+                                    //Fetches new filtered movies to display on home
                                     appViewModel.fetchPopularMovies()
                                 }
                             }
@@ -144,14 +158,20 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                             },
                             onClick = {
                                 if(appUiState.netflixFilter){
+                                    //Remove netflix filter
                                     appViewModel.removeStreamingFilter("8")
+                                    //Set netflix filter to false
                                     appViewModel.setNetflixFilter()
+                                    //Fetches new filtered movies to display on home
                                     appViewModel.fetchPopularMovies()
 
                                 }
                                 else{
+                                    //Add netflix filter
                                     appViewModel.addStreamingFilter("8")
+                                    //Set netflix filter to true
                                     appViewModel.setNetflixFilter()
+                                    //Fetches new filtered movies to display on home
                                     appViewModel.fetchPopularMovies()
 
                                 }
@@ -161,6 +181,7 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
+                //If viewing home make top bar transparent
                 containerColor = if(appUiState.viewingHome){ Color.Transparent } else{ MaterialTheme.colorScheme.surface}
 
             )

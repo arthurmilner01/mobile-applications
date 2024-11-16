@@ -1,7 +1,7 @@
 package com.example.filmswipe.data
-
+//Data class that packages the API response for cast and crew
 data class CastResponse(
-    val id: Int,  // The ID of the movie
-    val cast: List<CastMember>,
-    val crew: List<CrewMember>
+    val id: Int,  //Movie ID
+    val cast: List<CastMember>, //List of cast
+    val crew: List<CrewMember> //List of crew
 )

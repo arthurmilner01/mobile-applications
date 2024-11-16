@@ -16,8 +16,10 @@ import com.example.filmswipe.screens.*
 
 @Composable
 fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, appViewModel: AppViewModel){
+    //Init navhost
     NavHost(
         navController = navController as NavHostController,
+        //TODO: Check if user logged in to decide start destination???
         startDestination = "loginscreen",
         modifier= modifier
             .background(MaterialTheme.colorScheme.background)
@@ -25,9 +27,12 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
     )
     {
         composable("loginscreen",
+            //Animation when navigating
             exitTransition = {
                 slideOutOfContainer(
+                    //Will slide down on navigation
                     AnimatedContentTransitionScope.SlideDirection.Down,
+                    //Animation speed
                     animationSpec = tween(700)
                 )
             })
@@ -42,11 +47,13 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
         composable("settingsscreen") { SettingsScreen(navController, appViewModel, modifier) }
         composable("searchscreen") { SearchScreen(navController, appViewModel, modifier) }
         composable("moviedetailsscreen",
+            //Animation when navigating to the movie details screen
             enterTransition = {
             slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left,
                 animationSpec = tween(700)
             )},
+            //Animation when exiting the movie details screen
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Right,
