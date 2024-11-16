@@ -11,6 +11,9 @@ data class AppUiState(
     //Signup
     val incorrectSignUp:Boolean = false,
     val isSignedUp:Boolean = false,
+    val emailError: String? = "",
+    val usernameError: String? = "",
+    val passwordError: String? = "",
 
     //Navbar
     val navSelectedItem:Int = 0,

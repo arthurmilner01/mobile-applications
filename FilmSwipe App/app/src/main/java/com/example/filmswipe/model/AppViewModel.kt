@@ -271,23 +271,50 @@ class AppViewModel: ViewModel() {
         signUpUsernameInput = currentUsernameInput
     }
 
-    fun checkSignUpDetails(){
+    fun checkSignUpDetails() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                emailError = "",
+                usernameError = "",
+                passwordError = ""
+            )
+        }
+
+        //https://regexr.com/3e48o
+        val emailPattern = Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$")
+
+        when {
+            signUpEmailInput.isBlank() -> _uiState.update { it.copy(emailError = "Email cannot be empty.") }
+            !emailPattern.matches(signUpEmailInput) -> _uiState.update { it.copy(emailError = "Invalid email format.") }
+        }
+
+        when {
+            signUpUsernameInput.isBlank() -> _uiState.update { it.copy(usernameError = "Username cannot be empty.") }
+            signUpUsernameInput.length < 3 -> _uiState.update { it.copy(usernameError = "Username must be at least 3 characters long.") }
+        }
+
+        when {
+            signUpPasswordInput.isBlank() -> _uiState.update { it.copy(passwordError = "Password cannot be empty.") }
+            signUpPasswordInput.length < 6 -> _uiState.update { it.copy(passwordError = "Password must be at least 6 characters long.") }
+        }
+
+
+        if (_uiState.value.emailError != "" || _uiState.value.usernameError != "" || _uiState.value.passwordError != "") {
+            return
+        }
+
 
         auth.createUserWithEmailAndPassword(signUpEmailInput, signUpPasswordInput)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    //If account is unique will add to firebase
                     val user = auth.currentUser
                     user?.let {
-                        //Maps username and email input for insertion into user collection
                         val userDetails = mapOf(
                             "username" to signUpUsernameInput,
                             "email" to signUpEmailInput
                         )
-                        //Adds user info to firebase
                         db.collection("users").document(user.uid).set(userDetails)
                             .addOnSuccessListener {
-                                //Update UI and text inputs
                                 signUpEmailInput = ""
                                 signUpPasswordInput = ""
                                 signUpUsernameInput = ""
@@ -296,7 +323,6 @@ class AppViewModel: ViewModel() {
 
                                 _uiState.update { currentState ->
                                     currentState.copy(
-                                        incorrectSignUp = false,
                                         isSignedUp = true
                                     )
                                 }
@@ -306,15 +332,12 @@ class AppViewModel: ViewModel() {
                             }
                     }
                 } else {
-                    //If sign up fails display error and set UI states
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            incorrectSignUp = true,
-                            isSignedUp = false
-                        )
+                    val exceptionMessage = task.exception?.message ?: ""
+                    if (exceptionMessage.contains("email address is already in use", ignoreCase = true)) {
+                        _uiState.update { it.copy(emailError = "Email is already in use.") }
+                    } else {
+                        _uiState.update { it.copy(passwordError = "An unknown error has occured. Please try again.") }
                     }
-                    //Display reason for error
-                    _error.postValue("Sign-up failed: ${task.exception?.message}")
                 }
             }
     }

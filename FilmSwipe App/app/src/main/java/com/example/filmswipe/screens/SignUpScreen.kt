@@ -87,7 +87,7 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
         OutlinedTextField(
             value = appViewModel.signUpEmailInput,
             onValueChange = { appViewModel.updateSignUpEmailInput(it) },
-            isError = appUiState.incorrectSignUp,
+            isError = appUiState.emailError != "",
             label = { Text("Email",
                 color = MaterialTheme.colorScheme.onBackground) },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email Icon") },
@@ -96,11 +96,23 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
                 .fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
+        AnimatedVisibility(
+            visible = appUiState.emailError != ""
+        )
+        {
+            Text(
+                text = appUiState.emailError ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(vertical = 3.dp)
+            )
+        }
+
 
         OutlinedTextField(
             value = appViewModel.signUpUsernameInput,
             onValueChange = { appViewModel.updateSignUpUsernameInput(it) },
-            isError = appUiState.incorrectSignUp,
+            isError = appUiState.usernameError != "",
             label = { Text("Username",
                 color = MaterialTheme.colorScheme.onBackground)
             },
@@ -109,11 +121,22 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
                 .padding(bottom = 8.dp)
                 .fillMaxWidth(),
         )
+        AnimatedVisibility(
+            visible = appUiState.usernameError != ""
+        )
+        {
+            Text(
+                text = appUiState.usernameError ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(vertical = 3.dp)
+            )
+        }
 
         OutlinedTextField(
             value = appViewModel.signUpPasswordInput,
             onValueChange = { appViewModel.updateSignUpPasswordInput(it) },
-            isError = appUiState.incorrectSignUp,
+            isError = appUiState.passwordError != "",
             label = { Text("Password",
                 color = MaterialTheme.colorScheme.onBackground)
             },
@@ -124,17 +147,18 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
-
-
-        //TODO: Make specific error message for each form field
-        AnimatedVisibility(visible = appUiState.incorrectSignUp) {
+        AnimatedVisibility(
+            visible = appUiState.passwordError != ""
+        ) {
             Text(
-                text = "Please check your details and try again",
+                text = appUiState.passwordError ?: "",
                 color = Color.Red,
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 3.dp)
             )
         }
+
+
 
 
         Button(
