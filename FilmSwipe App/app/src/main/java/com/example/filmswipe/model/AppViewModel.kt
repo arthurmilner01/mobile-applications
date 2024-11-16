@@ -159,7 +159,12 @@ class AppViewModel: ViewModel() {
                 val response = RetrofitInstance.api.searchMoviesByTitle(apiKey, searchText)
 
                 if (response.isSuccessful) {
-                    _searchResults.postValue(response.body()?.results ?: emptyList())
+
+                    val filteredResults = response.body()?.results?.filter {
+                        movie ->movie.overview.isNotBlank() && movie.poster_path != null
+                    } ?: emptyList()
+
+                    _searchResults.postValue(filteredResults)
                     _error.postValue(null)
                 } else {
                     _error.postValue("Error: ${response.message()}")
