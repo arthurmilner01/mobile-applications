@@ -29,4 +29,12 @@ interface TMDBAPIService {
         @Query("page") pageNumber: Int = 1,
         @Query("language") language: String = "en-US"
     ): Response<MovieResponse>
+
+    @GET("movie/{movie_id}")
+    suspend fun getMovieDetails(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = "en-US"
+    ): Response<MovieDetailsResponse>
+
 }

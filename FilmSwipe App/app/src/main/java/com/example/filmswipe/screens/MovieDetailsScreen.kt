@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -68,6 +69,7 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
     LaunchedEffect(Unit){
         appViewModel.getScreenTitle(navController)
         appViewModel.fetchMovieCredits(appUiState.currentMovieID)
+        appViewModel.fetchMovieDetails(appUiState.currentMovieID)
         appViewModel.checkMovieInWatchlist(movieID = appUiState.currentMovieID)
         appViewModel.checkMovieInWatched(movieID = appUiState.currentMovieID)
     }
@@ -139,8 +141,55 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                             }
                         }
                     }
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(13.dp)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "${appUiState.currentMovieIMDBRating}★",
+                                    style = MaterialTheme.typography.bodyMedium.copy(color = Color.White)
+                                )
+                            }
+                        }
+                    }
                 }
             }
+
+
+            item {
+                Column(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Genres:",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = appUiState.currentMovieGenres.joinToString(", "),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+
             item {
                 Column(
                     modifier = Modifier

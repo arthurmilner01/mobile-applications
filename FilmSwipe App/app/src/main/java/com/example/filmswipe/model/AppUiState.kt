@@ -36,6 +36,8 @@ data class AppUiState(
     //Movie Details
     val viewingMovieDetails:Boolean = false,
     val viewingMovieCrew:Boolean = false,
+    val currentMovieGenres: List<String> = emptyList(),
+    val currentMovieIMDBRating: Double = 0.0,
 
     //Search
     val searchingUsers:Boolean = false

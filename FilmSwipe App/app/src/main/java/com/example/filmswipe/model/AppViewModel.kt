@@ -896,5 +896,28 @@ class AppViewModel: ViewModel() {
         }
     }
 
+    fun fetchMovieDetails(movieId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.getMovieDetails(movieId, apiKey)
+                if (response.isSuccessful) {
+                    response.body()?.let { details ->
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                currentMovieGenres = details.genres.map { it.name },
+                                currentMovieIMDBRating = String.format("%.1f", details.vote_average).toDouble()
+                            )
+                        }
+                    }
+                } else {
+                    Log.e("fetchMovieDetails", "Error: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("fetchMovieDetails", "Exception: ${e.message}")
+            }
+        }
+    }
+
+
 }
 
