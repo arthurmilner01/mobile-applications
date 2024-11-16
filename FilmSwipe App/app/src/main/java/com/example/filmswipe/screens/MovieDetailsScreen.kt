@@ -77,6 +77,13 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
     val imageUrl = "https://image.tmdb.org/t/p/w500${appUiState.currentMoviePosterPath ?: ""}"
     val director = crew.find{ it.job == "Director" } //Finds crew member who is the director
 
+
+    val ratingBackgroundColor = when {
+        appUiState.currentMovieIMDBRating >= 8.0 -> Color(0xFF4CC452) //Green for high ratings
+        appUiState.currentMovieIMDBRating >= 5.0 -> Color(0xFFDCA60D) //Yellow for medium ratings
+        else -> Color(0xFFF44336)              //Red for low ratings
+    }
+
     Column(modifier=Modifier.fillMaxSize()) {
 
         LazyColumn(
@@ -154,7 +161,7 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                                 modifier = Modifier
                                     .size(50.dp)
                                     .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primary),
+                                    .background(ratingBackgroundColor),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(

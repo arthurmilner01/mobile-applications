@@ -151,6 +151,13 @@ fun SwipableCard(
         else -> MaterialTheme.colorScheme.surface                            //Neutral
     }
 
+    val ratingBackgroundColor = when {
+        voteAverage >= 8.0 -> Color(0xFF4CC452) //Green for high ratings
+        voteAverage >= 5.0 -> Color(0xFFDCA60D) //Yellow for medium ratings
+        else -> Color(0xFFF44336)              //Red for low ratings
+    }
+
+
     Box(
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp, top = 40.dp, bottom = 40.dp)
@@ -228,7 +235,7 @@ fun SwipableCard(
                             modifier = Modifier
                                 .size(50.dp)
                                 .clip(MaterialTheme.shapes.medium)
-                                .background(MaterialTheme.colorScheme.primary),
+                                .background(ratingBackgroundColor),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
