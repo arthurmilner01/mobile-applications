@@ -1,5 +1,7 @@
 package com.example.filmswipe.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -24,6 +26,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -87,6 +90,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                 {
                     SwipableCard(
                         navController = navController,
+                        movieId = movies[index].id,
                         title = movies[index].title,
                         subtitle = movies[index].overview,
                         filmImage = movies[index].poster_path,
@@ -119,6 +123,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
 @Composable
 fun SwipableCard(
     navController: NavController,
+    movieId: Int,
     title: String,
     subtitle: String,
     filmImage: String?,
@@ -157,6 +162,8 @@ fun SwipableCard(
         else -> Color(0xFFF44336)              //Red for low ratings
     }
 
+    //Opening movie detail in browser
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -229,6 +236,12 @@ fun SwipableCard(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(13.dp)
+                        .clickable{
+                            val tmdbUrl = "https://www.themoviedb.org/movie/${movieId}"
+                            //https://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(tmdbUrl))
+                            context.startActivity(intent)
+                        }
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Box(

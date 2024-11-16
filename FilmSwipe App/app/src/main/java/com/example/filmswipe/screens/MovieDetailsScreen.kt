@@ -1,6 +1,8 @@
 package com.example.filmswipe.screens
 
+import android.content.Intent
 import android.graphics.Paint.Align
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -45,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,6 +86,9 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
         appUiState.currentMovieIMDBRating >= 5.0 -> Color(0xFFDCA60D) //Yellow for medium ratings
         else -> Color(0xFFF44336)              //Red for low ratings
     }
+
+    //Opening movie detail in browser
+    val context = LocalContext.current
 
     Column(modifier=Modifier.fillMaxSize()) {
 
@@ -153,6 +159,12 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(13.dp)
+                            .clickable{
+                                val tmdbUrl = "https://www.themoviedb.org/movie/${appUiState.currentMovieID}"
+                                //https://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(tmdbUrl))
+                                context.startActivity(intent)
+                            }
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
