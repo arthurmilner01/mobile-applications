@@ -53,5 +53,7 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
                     animationSpec = tween(700)
                 )
             }) { MovieDetailsScreen(navController, appViewModel, modifier)}
+        composable("changepasswordscreen") { ChangePasswordScreen(navController, appViewModel, modifier) }
+
     }
 }

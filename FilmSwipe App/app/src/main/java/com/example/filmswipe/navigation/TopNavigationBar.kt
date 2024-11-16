@@ -1,22 +1,12 @@
 package com.example.filmswipe.navigation
 
-import android.widget.Space
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,7 +46,7 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if(appUiState.viewingHome){ "" } else{ appUiState.navScreenTitle},
+                        text = if(appUiState.viewingHome || appUiState.viewingChangePassword){ "" } else{ appUiState.navScreenTitle},
                         color = MaterialTheme.colorScheme.tertiary,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
@@ -68,6 +58,15 @@ fun TopNavigationBar(navController: NavController, appViewModel: AppViewModel){
             navigationIcon = {
                 // Display back arrow only if viewingMovieDetails is true
                 if (appUiState.viewingMovieDetails) {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                }
+                if (appUiState.viewingChangePassword) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,

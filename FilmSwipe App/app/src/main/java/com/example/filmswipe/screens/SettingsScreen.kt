@@ -41,10 +41,10 @@ fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, mod
         Row(modifier= Modifier
             .padding(5.dp)
             .fillMaxWidth()
-            .clickable {  }, //TODO: MAKE FUNCTIONAL
+            .clickable { navController.navigate("changepasswordscreen")  },
             verticalAlignment = Alignment.CenterVertically)
         {
-            Text(text = "Edit Profile",
+            Text(text = "Change Password",
                 modifier = modifier.padding(10.dp),
                 style= MaterialTheme.typography.labelLarge)
         }

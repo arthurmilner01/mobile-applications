@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
@@ -15,8 +14,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.filmswipe.data.*
 import com.example.filmswipe.network.*
-import com.google.android.gms.common.api.Response
 import com.google.firebase.Firebase
+import com.google.firebase.auth.EmailAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
-import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
 import kotlin.random.Random
 
@@ -40,6 +38,12 @@ class AppViewModel: ViewModel() {
     var signUpEmailInput by mutableStateOf("")
     var signUpUsernameInput by mutableStateOf("")
     var signUpPasswordInput by mutableStateOf("")
+    //Change password
+    var changePasswordCurrentPasswordInput by mutableStateOf("")
+    var changePasswordPasswordInput by mutableStateOf("")
+    var changePasswordConfirmPasswordInput by mutableStateOf("")
+
+
     // Search
     var searchText by mutableStateOf("")
     var searchCheckbox by mutableStateOf(false)
@@ -274,34 +278,33 @@ class AppViewModel: ViewModel() {
     fun checkSignUpDetails() {
         _uiState.update { currentState ->
             currentState.copy(
-                emailError = "",
-                usernameError = "",
-                passwordError = ""
+                signUpEmailError = "",
+                signUpUsernameError = "",
+                signUpPasswordError = ""
             )
         }
 
         //https://regexr.com/3e48o
         val emailPattern = Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$")
 
-        when {
-            signUpEmailInput.isBlank() -> _uiState.update { it.copy(emailError = "Email cannot be empty.") }
-            !emailPattern.matches(signUpEmailInput) -> _uiState.update { it.copy(emailError = "Invalid email format.") }
+        if (!emailPattern.matches(signUpEmailInput)) {
+            _uiState.update { it.copy(signUpEmailError = "Invalid email format.") }
         }
 
-        when {
-            signUpUsernameInput.isBlank() -> _uiState.update { it.copy(usernameError = "Username cannot be empty.") }
-            signUpUsernameInput.length < 3 -> _uiState.update { it.copy(usernameError = "Username must be at least 3 characters long.") }
+        if (signUpUsernameInput.length < 3) {
+            _uiState.update { it.copy(signUpUsernameError = "Username must be at least 3 characters long.") }
         }
 
-        when {
-            signUpPasswordInput.isBlank() -> _uiState.update { it.copy(passwordError = "Password cannot be empty.") }
-            signUpPasswordInput.length < 6 -> _uiState.update { it.copy(passwordError = "Password must be at least 6 characters long.") }
+        if (signUpPasswordInput.length < 6) {
+            _uiState.update { it.copy(signUpPasswordError = "Password must be at least 6 characters long.") }
         }
 
-
-        if (_uiState.value.emailError != "" || _uiState.value.usernameError != "" || _uiState.value.passwordError != "") {
+        if (_uiState.value.signUpEmailError != "" ||
+            _uiState.value.signUpUsernameError != "" ||
+            _uiState.value.signUpPasswordError != "") {
             return
         }
+
 
 
         auth.createUserWithEmailAndPassword(signUpEmailInput, signUpPasswordInput)
@@ -334,9 +337,9 @@ class AppViewModel: ViewModel() {
                 } else {
                     val exceptionMessage = task.exception?.message ?: ""
                     if (exceptionMessage.contains("email address is already in use", ignoreCase = true)) {
-                        _uiState.update { it.copy(emailError = "Email is already in use.") }
+                        _uiState.update { it.copy(signUpEmailError = "Email is already in use.") }
                     } else {
-                        _uiState.update { it.copy(passwordError = "An unknown error has occured. Please try again.") }
+                        _uiState.update { it.copy(signUpPasswordError = "An unknown error has occured. Please try again.") }
                     }
                 }
             }
@@ -778,7 +781,8 @@ class AppViewModel: ViewModel() {
         "settingsscreen" to "Settings",
         "loginscreen" to "Login",
         "searchscreen" to "Search",
-        "moviedetailsscreen" to ""
+        "moviedetailsscreen" to "",
+        "changepasswordscreen" to "Change Password"
     )
 
     fun getScreenTitle(navController: NavController){
@@ -792,7 +796,8 @@ class AppViewModel: ViewModel() {
             _uiState.update{
                     currentState -> currentState.copy(
                 viewingMovieDetails =  true,
-                viewingHome = false
+                viewingHome = false,
+                viewingChangePassword =  false
             )
             }
         }
@@ -800,7 +805,17 @@ class AppViewModel: ViewModel() {
             _uiState.update{
                     currentState -> currentState.copy(
                 viewingMovieDetails =  false,
-                viewingHome = true
+                viewingHome = true,
+                viewingChangePassword =  false
+            )
+            }
+        }
+        else if(screenTitles[currentScreen] == "Change Password"){
+            _uiState.update{
+                    currentState -> currentState.copy(
+                viewingMovieDetails =  false,
+                viewingHome = false,
+                viewingChangePassword =  true
             )
             }
         }
@@ -809,7 +824,8 @@ class AppViewModel: ViewModel() {
             _uiState.update{
                     currentState -> currentState.copy(
                 viewingMovieDetails =  false,
-                viewingHome = false
+                viewingHome = false,
+                viewingChangePassword =  false
             )
             }
         }
@@ -941,6 +957,77 @@ class AppViewModel: ViewModel() {
         }
     }
 
+
+    //Change Password Funcs
+    fun updateChangePasswordCurrentPasswordInput(currentPasswordInput: String){
+        changePasswordCurrentPasswordInput = currentPasswordInput
+    }
+
+    fun updateChangePasswordPasswordInput(password:String){
+        changePasswordPasswordInput = password
+    }
+
+    fun updateChangePasswordConfirmPasswordInput(confirmPassword:String){
+        changePasswordConfirmPasswordInput = confirmPassword
+    }
+
+    fun checkChangePasswordDetails() {
+        // Reset error messages and success state
+        _uiState.update { currentState ->
+            currentState.copy(
+                changePasswordCurrentPasswordError = "",
+                changePasswordPasswordError = "",
+                changePasswordConfirmPasswordError = "",
+                isUpdatedPasswordSuccess = false
+            )
+        }
+
+
+        if (changePasswordPasswordInput.length < 6) {
+            _uiState.update { it.copy(changePasswordPasswordError = "Password must be at least 6 characters long.") }
+        }
+        if (changePasswordConfirmPasswordInput != changePasswordPasswordInput) {
+            _uiState.update { it.copy(changePasswordConfirmPasswordError = "Passwords do not match.") }
+        }
+
+        if (_uiState.value.changePasswordCurrentPasswordError != "" ||
+            _uiState.value.changePasswordPasswordError != ""  ||
+            _uiState.value.changePasswordConfirmPasswordError != ""
+        ) {
+            return
+        }
+
+        val user = auth.currentUser
+        if (user != null) {
+            //Reauthenticating the user as only authorized users can change sensitive details
+            val credential = EmailAuthProvider.getCredential(user.email ?: "", changePasswordCurrentPasswordInput)
+            user.reauthenticate(credential)
+                .addOnCompleteListener { reauthTask ->
+                    if (reauthTask.isSuccessful) {
+
+                        user.updatePassword(changePasswordPasswordInput)
+                            .addOnCompleteListener { updateTask ->
+                                if (updateTask.isSuccessful) {
+                                    _uiState.update { currentState ->
+                                        currentState.copy(
+                                            isUpdatedPasswordSuccess = true
+                                        )
+                                    }
+
+                                    changePasswordCurrentPasswordInput = ""
+                                    changePasswordPasswordInput = ""
+                                    changePasswordConfirmPasswordInput = ""
+
+                                } else {
+                                    _uiState.update { it.copy(changePasswordPasswordError = "An unknown error has occured. Please try again.") }
+                                }
+                            }
+                    } else {
+                        _uiState.update { it.copy(changePasswordCurrentPasswordError = "Password is incorrect.") }
+                    }
+                }
+        }
+    }
 
 }
 

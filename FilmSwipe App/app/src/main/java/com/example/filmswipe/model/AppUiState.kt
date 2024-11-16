@@ -9,11 +9,18 @@ data class AppUiState(
     val loggedInUID:String = "",
 
     //Signup
-    val incorrectSignUp:Boolean = false,
     val isSignedUp:Boolean = false,
-    val emailError: String? = "",
-    val usernameError: String? = "",
-    val passwordError: String? = "",
+    val signUpEmailError: String? = "",
+    val signUpUsernameError: String? = "",
+    val signUpPasswordError: String? = "",
+
+    //Change Password
+    val viewingChangePassword:Boolean = false,
+    val changePasswordCurrentPasswordError: String? = "",
+    val changePasswordPasswordError: String? = "",
+    val changePasswordConfirmPasswordError: String? = "",
+    val isUpdatedPasswordSuccess:Boolean = false,
+
 
     //Navbar
     val navSelectedItem:Int = 0,

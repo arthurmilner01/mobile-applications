@@ -12,9 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -41,17 +39,13 @@ import com.example.filmswipe.R
 import com.example.filmswipe.model.AppViewModel
 
 @Composable
-fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
+fun ChangePasswordScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     val appUiState by appViewModel.uiState.collectAsState()
     val loginImage = painterResource(R.drawable.filmswipelogo)
 
-
-    LaunchedEffect(appUiState.isSignedUp) {
-        if (appUiState.isSignedUp) {
-            navController.navigate("loginscreen")
-        }
+    LaunchedEffect(Unit){
+        appViewModel.getScreenTitle(navController)
     }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -72,7 +66,7 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
         )
 
         Text(
-            text = "Sign Up",
+            text = "Change Password",
             style = MaterialTheme.typography.displayMedium.copy(
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
@@ -82,62 +76,21 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
                 .padding(bottom = 16.dp)
         )
 
-
-
-        OutlinedTextField(
-            value = appViewModel.signUpEmailInput,
-            onValueChange = { appViewModel.updateSignUpEmailInput(it) },
-            isError = appUiState.signUpEmailError != "",
-            label = { Text("Email",
-                color = MaterialTheme.colorScheme.onBackground) },
-            leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email Icon") },
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-        )
-        AnimatedVisibility(
-            visible = appUiState.signUpEmailError != ""
-        )
-        {
+        AnimatedVisibility(visible = appUiState.isUpdatedPasswordSuccess) {
             Text(
-                text = appUiState.signUpEmailError ?: "",
-                color = Color.Red,
+                text = "Password updated successfully!",
+                color = Color.Green,
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(vertical = 3.dp)
+                modifier = Modifier.padding(vertical = 8.dp)
             )
         }
 
 
         OutlinedTextField(
-            value = appViewModel.signUpUsernameInput,
-            onValueChange = { appViewModel.updateSignUpUsernameInput(it) },
-            isError = appUiState.signUpUsernameError != "",
-            label = { Text("Username",
-                color = MaterialTheme.colorScheme.onBackground)
-            },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Username Icon") },
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .fillMaxWidth(),
-        )
-        AnimatedVisibility(
-            visible = appUiState.signUpUsernameError != ""
-        )
-        {
-            Text(
-                text = appUiState.signUpUsernameError ?: "",
-                color = Color.Red,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(vertical = 3.dp)
-            )
-        }
-
-        OutlinedTextField(
-            value = appViewModel.signUpPasswordInput,
-            onValueChange = { appViewModel.updateSignUpPasswordInput(it) },
-            isError = appUiState.signUpPasswordError != "",
-            label = { Text("Password",
+            value = appViewModel.changePasswordCurrentPasswordInput,
+            onValueChange = { appViewModel.updateChangePasswordCurrentPasswordInput(it) },
+            isError = appUiState.changePasswordCurrentPasswordError != "",
+            label = { Text("Current Password",
                 color = MaterialTheme.colorScheme.onBackground)
             },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Lock Icon") },
@@ -148,10 +101,59 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
         AnimatedVisibility(
-            visible = appUiState.signUpPasswordError != ""
+            visible = appUiState.changePasswordCurrentPasswordError != ""
         ) {
             Text(
-                text = appUiState.signUpPasswordError ?: "",
+                text = appUiState.changePasswordCurrentPasswordError ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(vertical = 3.dp)
+            )
+        }
+
+        OutlinedTextField(
+            value = appViewModel.changePasswordPasswordInput,
+            onValueChange = { appViewModel.updateChangePasswordPasswordInput(it) },
+            isError = appUiState.changePasswordPasswordError != "",
+            label = { Text("New Password",
+                color = MaterialTheme.colorScheme.onBackground)
+            },
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
+        AnimatedVisibility(
+            visible = appUiState.changePasswordPasswordError != ""
+        ) {
+            Text(
+                text = appUiState.changePasswordPasswordError ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(vertical = 3.dp)
+            )
+        }
+
+
+        OutlinedTextField(
+            value = appViewModel.changePasswordConfirmPasswordInput,
+            onValueChange = { appViewModel.updateChangePasswordConfirmPasswordInput(it) },
+            isError = appUiState.changePasswordConfirmPasswordError != "",
+            label = { Text("Confirm New Password",
+                color = MaterialTheme.colorScheme.onBackground)
+            },
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        )
+        AnimatedVisibility(
+            visible = appUiState.changePasswordConfirmPasswordError != ""
+        ) {
+            Text(
+                text = appUiState.changePasswordConfirmPasswordError ?: "",
                 color = Color.Red,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(vertical = 3.dp)
@@ -160,20 +162,19 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
 
 
 
-
         Button(
-            onClick = { appViewModel.checkSignUpDetails() }, modifier= Modifier
+            onClick = { appViewModel.checkChangePasswordDetails() }, modifier= Modifier
                 .padding(10.dp)
                 .size(width = 200.dp, height = 50.dp),
-            enabled = appViewModel.signUpEmailInput.isNotEmpty() &&
-                    appViewModel.signUpUsernameInput.isNotEmpty() &&
-                    appViewModel.signUpPasswordInput.isNotEmpty(),
+            enabled = appViewModel.changePasswordCurrentPasswordInput.isNotEmpty() &&
+                    appViewModel.changePasswordPasswordInput.isNotEmpty() &&
+                    appViewModel.changePasswordConfirmPasswordInput.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary)
         )
         {
             Text(
-                "Sign-Up",
+                "Confirm Changes",
                 style= MaterialTheme.typography.bodyMedium,
                 color = Color.White
             )
@@ -187,12 +188,12 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Already have an account?",
+                text = "Don't want to edit your password?",
                 color = Color.White,
             )
-            TextButton(onClick = { navController.navigate("loginScreen") }) {
+            TextButton(onClick = { navController.navigate("settingsscreen") }) {
                 Text(
-                    text = "Login",
+                    text = "Return to Settings",
                     color = MaterialTheme.colorScheme.tertiary,
                     textDecoration = TextDecoration.Underline
                 )

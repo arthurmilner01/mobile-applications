@@ -27,7 +27,7 @@ fun BottomNavigationBar(navController: NavController, appViewModel: AppViewModel
     val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Person, Icons.Filled.Settings)
     val unselectedIcons = listOf(Icons.Outlined.Home, Icons.Outlined.Search, Icons.Outlined.Person, Icons.Outlined.Settings)
 
-    if(appUiState.isLoggedIn){
+    if(appUiState.isLoggedIn && !appUiState.viewingChangePassword){
         NavigationBar(
             containerColor = MaterialTheme.colorScheme.surface
         ){
