@@ -90,6 +90,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                         title = movies[index].title,
                         subtitle = movies[index].overview,
                         filmImage = movies[index].poster_path,
+                        voteAverage =  movies[index].vote_average,
                         onSwipeLeft = {
                             appViewModel.removeMovie(index)
                             if(isLastMovie) {
@@ -121,6 +122,7 @@ fun SwipableCard(
     title: String,
     subtitle: String,
     filmImage: String?,
+    voteAverage: Double,
     onSwipeLeft: () -> Unit = {},
     onSwipeRight: () -> Unit = {},
     onSwipeUp: () -> Unit = {}
@@ -215,6 +217,28 @@ fun SwipableCard(
                         .fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(13.dp)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(MaterialTheme.shapes.medium)
+                                .background(MaterialTheme.colorScheme.primary),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = String.format("%.1f★", voteAverage),
+                                style = MaterialTheme.typography.bodyMedium.copy(color = Color.White)
+                            )
+                        }
+                    }
+                }
+
 
                 Column(
                     modifier = Modifier
