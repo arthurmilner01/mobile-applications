@@ -36,7 +36,6 @@ fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, mod
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
         Row(modifier= Modifier
@@ -46,7 +45,7 @@ fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, mod
             verticalAlignment = Alignment.CenterVertically)
         {
             Text(text = "Edit Profile",
-                modifier = modifier,
+                modifier = modifier.padding(10.dp),
                 style= MaterialTheme.typography.labelLarge)
         }
 
@@ -62,7 +61,7 @@ fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, mod
             verticalAlignment = Alignment.CenterVertically)
         {
             Text(text = "Log-Out",
-                modifier = modifier,
+                modifier = modifier.padding(10.dp),
                 style= MaterialTheme.typography.labelLarge)
         }
 
@@ -75,7 +74,7 @@ fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, mod
             verticalAlignment = Alignment.CenterVertically)
         {
             Text(text = "Quit Application",
-                modifier = modifier,
+                modifier = modifier.padding(10.dp),
                 style= MaterialTheme.typography.labelLarge)
         }
 
