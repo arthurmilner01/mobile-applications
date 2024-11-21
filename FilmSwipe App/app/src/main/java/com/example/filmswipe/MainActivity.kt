@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -50,6 +51,9 @@ class MainActivity : ComponentActivity() {
             val appViewModel: AppViewModel = viewModel()
 
             FilmSwipeTheme(navController = navController, appViewModel = appViewModel){
+                LaunchedEffect(Unit) {
+                    appViewModel.restoreLoginState()
+                }
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     ////Passing nav controller/view model to top and bottom nav bars
                     topBar = { TopNavigationBar(navController, appViewModel)},

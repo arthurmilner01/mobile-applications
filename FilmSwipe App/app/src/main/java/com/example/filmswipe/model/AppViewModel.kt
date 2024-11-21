@@ -1,5 +1,8 @@
 package com.example.filmswipe.model
 
+import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
@@ -7,6 +10,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,7 +34,9 @@ import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import kotlin.random.Random
 
-class AppViewModel: ViewModel() {
+//Using AndroidViewModel application context for persistent storage using SharedPreferences
+//https://blog.mansi.dev/difference-between-androidviewmodel-and-viewmodel
+class AppViewModel(application: Application) : AndroidViewModel(application) {
     //TODO: Comment and see if can be split to multiple files
 
     private val _uiState = MutableStateFlow(AppUiState())
@@ -49,6 +55,8 @@ class AppViewModel: ViewModel() {
     var changePasswordPasswordInput by mutableStateOf("")
     var changePasswordConfirmPasswordInput by mutableStateOf("")
 
+    //SharedPreferences
+    private val sharedPreferences: SharedPreferences = application.getSharedPreferences("userState", Context.MODE_PRIVATE)
 
     // Search
     var searchText by mutableStateOf("")
@@ -249,6 +257,7 @@ class AppViewModel: ViewModel() {
             incorrectLogin = false
         )
         }
+        clearLoginState()
     }
 
     fun newSignUp(){
@@ -271,6 +280,7 @@ class AppViewModel: ViewModel() {
         }
         emailInput = ""
         passwordInput = ""
+        saveLoginState(true, currentEmailInput, currentUsernameInput, userUID);
     }
 
     //Sign Up funcs
@@ -354,6 +364,43 @@ class AppViewModel: ViewModel() {
                     }
                 }
             }
+    }
+
+    //Shared Preferences funcs
+    //Save login state to persistence storage
+    fun saveLoginState(isLoggedIn: Boolean, email: String, username: String, uid: String) {
+        sharedPreferences.edit().apply {
+            putBoolean("isLoggedIn", isLoggedIn)
+            putString("loggedInEmail", email)
+            putString("loggedInUsername", username)
+            putString("loggedInUID", uid)
+            apply()
+        }
+    }
+
+    //Clear login persistent state(on logout)
+    fun clearLoginState() {
+        sharedPreferences.edit().apply {
+            clear()
+            apply()
+        }
+    }
+
+    //Restore application state from SharedPreferences on app initialized
+    fun restoreLoginState() {
+        val loggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+        val email = sharedPreferences.getString("loggedInEmail", "") ?: ""
+        val username = sharedPreferences.getString("loggedInUsername", "") ?: ""
+        val uid = sharedPreferences.getString("loggedInUID", "") ?: ""
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                isLoggedIn = loggedIn,
+                loggedInEmail = email,
+                loggedInUsername = username,
+                loggedInUID = uid
+            )
+        }
     }
 
     //Home page funcs
