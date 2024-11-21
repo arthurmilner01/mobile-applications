@@ -3,6 +3,7 @@ package com.example.filmswipe.screens
 import android.content.Intent
 import android.graphics.Paint.Align
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween

@@ -1,6 +1,7 @@
 package com.example.filmswipe.screens
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
@@ -45,6 +46,9 @@ import kotlin.math.abs
 
 @Composable
 fun ProfileScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier, email: String? = null){
+
+    BackHandler(enabled=(email == null)){ }
+
     //For the use of the camera
     val context = LocalContext.current
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }

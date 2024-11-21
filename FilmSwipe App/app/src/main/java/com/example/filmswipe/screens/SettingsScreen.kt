@@ -1,5 +1,6 @@
 package com.example.filmswipe.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,8 @@ import com.example.filmswipe.model.AppViewModel
 @Composable
 fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier){
     val appUiState by appViewModel.uiState.collectAsState()
+
+    BackHandler{ }
 
     LaunchedEffect(Unit) {
         if (!appUiState.isLoggedIn) {

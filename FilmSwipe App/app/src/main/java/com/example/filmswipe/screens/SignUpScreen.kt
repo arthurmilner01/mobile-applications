@@ -1,5 +1,6 @@
 package com.example.filmswipe.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +46,7 @@ fun SignUpScreen(navController: NavController, appViewModel: AppViewModel, modif
     val appUiState by appViewModel.uiState.collectAsState()
     val loginImage = painterResource(R.drawable.filmswipelogo)
 
+    BackHandler{ }
 
     LaunchedEffect(appUiState.isSignedUp) {
         if (appUiState.isSignedUp) {

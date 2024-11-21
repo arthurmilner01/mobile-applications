@@ -1,5 +1,6 @@
 package com.example.filmswipe.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,6 +48,8 @@ fun SearchScreen(navController: NavController, appViewModel: AppViewModel, modif
     val appUiState by appViewModel.uiState.collectAsState()
     val searchResults by appViewModel.searchResults.observeAsState(emptyList())
     val userSearchResults by appViewModel.userSearchResults.observeAsState(emptyList())
+
+    BackHandler {  }
 
     LaunchedEffect(Unit){
         appViewModel.getScreenTitle(navController)

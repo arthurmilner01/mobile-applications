@@ -2,6 +2,7 @@ package com.example.filmswipe.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -55,6 +56,8 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
     val loading by appViewModel.loading.observeAsState(initial = false)
     //For when API call errors
     val error by appViewModel.error.observeAsState(initial = null)
+
+    BackHandler {  }
 
     LaunchedEffect(Unit){
         //Get screen title for top nav
