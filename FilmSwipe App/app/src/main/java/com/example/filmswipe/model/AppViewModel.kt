@@ -34,10 +34,7 @@ import java.io.ByteArrayOutputStream
 import kotlin.random.Random
 
 //Using AndroidViewModel application context for persistent storage using SharedPreferences
-//https://blog.mansi.dev/difference-between-androidviewmodel-and-viewmodel
 class AppViewModel(application: Application) : AndroidViewModel(application) {
-    //TODO: See if can be split to multiple files
-
     //User input states
     //Log In
     var emailInput by mutableStateOf("")

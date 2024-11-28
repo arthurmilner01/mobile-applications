@@ -1,12 +1,12 @@
 package com.example.filmswipe.data
-//TODO: Comment
+
 data class MovieDetailsResponse(
-    val genres: List<Genre>,
-    val imdb_id: String?,
-    val vote_average: Double
+    val genres: List<Genre>, //List of genres for the given movie
+    val imdb_id: String?, //Movie ID
+    val vote_average: Double //Average user rating for the given movie
 )
 
 data class Genre(
-    val id: Int,
-    val name: String
+    val id: Int, //Genre ID
+    val name: String //Genre name
 )

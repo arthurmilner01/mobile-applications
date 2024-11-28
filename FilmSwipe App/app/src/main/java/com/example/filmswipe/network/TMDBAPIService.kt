@@ -35,7 +35,7 @@ interface TMDBAPIService {
         @Query("language") language: String = "en-US"
     ): Response<MovieResponse>
 
-    //TODO: Comment
+    //Used for getting movie's genre and average user rating
     @GET("movie/{movie_id}")
     suspend fun getMovieDetails(
         @Path("movie_id") movieId: Int,

@@ -172,7 +172,7 @@ fun MovieDetailsScreen(navController: NavController, appViewModel: AppViewModel,
                             .align(Alignment.TopEnd)
                             .padding(13.dp)
                             .clickable{
-                                //TODO: Cite web browser source here from bibliography
+                                //Opens link in web browser
                                 val tmdbUrl = "https://www.themoviedb.org/movie/${appUiState.currentMovieID}"
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(tmdbUrl))
                                 context.startActivity(intent)

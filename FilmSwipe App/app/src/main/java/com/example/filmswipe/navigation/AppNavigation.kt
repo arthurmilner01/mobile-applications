@@ -19,7 +19,6 @@ fun AppNavigator(modifier: Modifier = Modifier, navController: NavController, ap
     //Init navhost
     NavHost(
         navController = navController as NavHostController,
-        //TODO: Check if user logged in to decide start destination???
         startDestination = "loginscreen",
         modifier= modifier
             .background(MaterialTheme.colorScheme.background)
