@@ -51,6 +51,8 @@ import com.example.filmswipe.ui.theme.FilmSwipeTheme
 //For converting base64 to a bitmap image for displaying in the app
 //https://stackoverflow.com/questions/4837110/how-to-convert-a-base64-string-into-a-bitmap-image-to-show-it-in-a-imageview
 
+//Using AndroidViewModel application context for persistent storage using SharedPreferences
+//https://blog.mansi.dev/difference-between-androidviewmodel-and-viewmodel
 
 
 class MainActivity : ComponentActivity() {

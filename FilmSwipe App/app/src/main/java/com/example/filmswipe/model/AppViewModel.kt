@@ -36,9 +36,9 @@ import kotlin.random.Random
 //Using AndroidViewModel application context for persistent storage using SharedPreferences
 //https://blog.mansi.dev/difference-between-androidviewmodel-and-viewmodel
 class AppViewModel(application: Application) : AndroidViewModel(application) {
-    //TODO: Comment and see if can be split to multiple files
+    //TODO: See if can be split to multiple files
 
-    //User input
+    //User input states
     //Log In
     var emailInput by mutableStateOf("")
     var passwordInput by mutableStateOf("")
@@ -53,6 +53,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     // Search
     var searchText by mutableStateOf("")
 
+
     //uiState
     private val _uiState = MutableStateFlow(AppUiState())
     val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
@@ -66,16 +67,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     //Firebase db instance
     private val db = Firebase.firestore
 
-    //API
+    //API key
     private val apiKey = "bee0c37b9c1a2d1c1ecf80b6cce631a5"
 
     //Live data object for movies
     private val _movies = MutableLiveData<List<Movie>>()
     val movies: LiveData<List<Movie>> get() = _movies
-
+    //Used when waiting for response from API call
     private val _loading = MutableLiveData<Boolean>()
     val loading: LiveData<Boolean> get() = _loading
-
+    //Used when API call returns an error
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> get() = _error
 
@@ -87,10 +88,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     //Live data for crew
     private val _crew = MutableLiveData<List<CrewMember>>()
     val crew: LiveData<List<CrewMember>> get() = _crew
-
+    //Used when waiting for response from cast/crew API call
     private val _creditsLoading = MutableLiveData<Boolean>()
     val creditsLoading: LiveData<Boolean> get() = _creditsLoading
-
+    //Used when API call returns an error
     private val _creditsError = MutableLiveData<String?>()
     val creditsError: LiveData<String?> get() = _creditsError
 
@@ -112,77 +113,94 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val watchedMovies: LiveData<List<ProfileMovie>> get() = _watchedMovies
 
 
-
+    //API call which fetches movies at random based on current filters
     fun fetchPopularMovies() {
+        //Display loading when waiting response
         _loading.value = true
         viewModelScope.launch {
             try {
-                //API call with random page number
+                //API call with random page number between 1-100
                 val pageNumber = Random.nextInt(1,100)
+                //Get response from API call, reponse will be a list of Movie objects
                 val response = RetrofitInstance.api.getPopularMovies(apiKey, pageNumber, _uiState.value.watchProviderFilter)
 
                 if (response.isSuccessful) {
+                    //Add movies to the movies live data
                     _movies.postValue(response.body()?.results ?: emptyList())
+                    //Clear any previous errors
                     _error.postValue(null)
                 } else {
-                    _error.postValue("Error: ${response.message()}")
+                    _error.postValue("Error getting movies.")
                 }
             } catch (e: Exception) {
-                _error.postValue("Exception: ${e.message}")
+                _error.postValue("Error getting movies.")
             } finally {
+                //Set loading false as response received
                 _loading.postValue(false)
             }
         }
     }
 
+    //API call that fetches the current movies cast/crew
     fun fetchMovieCredits(movieId: Int) {
+        //Show loading wheel
         _creditsLoading.value = true
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.api.getMovieCredits(movieId, apiKey) // Adjust your API call as needed
+                //Get API response, will return list of cast and list of crew
+                val response = RetrofitInstance.api.getMovieCredits(movieId, apiKey)
                 if (response.isSuccessful) {
                     response.body()?.let { credits ->
-                        _cast.postValue(credits.cast) // Update cast LiveData
-                        // You can also create a new LiveData for crew or handle it as needed
-                        _crew.postValue(credits.crew) // If you have a separate LiveData for crew
-                        _creditsError.postValue(null) // Clear any previous errors
+                        //Adding the list of cast to the cast live data object
+                        _cast.postValue(credits.cast)
+                        //Adding the list of crew to the crew live data object
+                        _crew.postValue(credits.crew)
+                        //Clearing errors from previous calls
+                        _creditsError.postValue(null)
                     }
                 } else {
-                    _creditsError.postValue("Error: ${response.message()}")
+                    _creditsError.postValue("Error getting movie credits.")
                 }
             } catch (e: Exception) {
-                _creditsError.postValue("Exception: ${e.message}")
+                _creditsError.postValue("Error getting movie credits.")
             } finally {
+                //When try finished stop loading
                 _creditsLoading.postValue(false)
             }
         }
     }
 
     fun searchMoviesByTitle() {
+        //If user attempts to search with no input
         if (searchText.isBlank()) {
+            //Empty list
             _searchResults.postValue(emptyList())
             return
         }
-
+        //Set loading to true until results received
         _loading.value = true
         viewModelScope.launch {
             try {
+                //Making API call to return relevant movies based on user input
                 val response = RetrofitInstance.api.searchMoviesByTitle(apiKey, searchText)
 
                 if (response.isSuccessful) {
-
+                    //Filter results so only movies without missing details are displayed
                     val filteredResults = response.body()?.results?.filter {
+                        //Movie must have poster and an overview
                         movie ->movie.overview.isNotBlank() && movie.poster_path != null
                     } ?: emptyList()
-
+                    //Add the movies returned to search results live data for displaying to UI
                     _searchResults.postValue(filteredResults)
+                    //Clear errors as successful
                     _error.postValue(null)
                 } else {
-                    _error.postValue("Error: ${response.message()}")
+                    _error.postValue("Error searching movies.")
                 }
             } catch (e: Exception) {
-                _error.postValue("Exception: ${e.message}")
+                _error.postValue("Error searching movies.")
             } finally {
+                //Set loading to false once try is complete to hide loading wheel
                 _loading.postValue(false)
             }
         }
@@ -191,14 +209,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
 
     //Log In funcs
+    //Update based on users inputs on log-in page
     fun updateEmailInput(currentEmailInput:String){
         emailInput = currentEmailInput
     }
-
     fun updatePasswordInput(currentPasswordInput:String){
         passwordInput = currentPasswordInput
     }
 
+    //Checking the login details provided by the user
     fun checkLoginDetails(){
         //If either email or password blank
         if (emailInput.isBlank() || passwordInput.isBlank()) {
@@ -209,7 +228,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 )
             }
         }
-
+        //Firebase auth sign-in
         auth.signInWithEmailAndPassword(emailInput, passwordInput)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -217,13 +236,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     val user = auth.currentUser
                     //Sends username and email to user logs in function
                     user?.let {
+                        //Get username and email from Firebase db
+                        //Firebase auth UID will be the same as that users document ID
                         db.collection("users").document(user.uid).get()
                             .addOnSuccessListener { document ->
                                 val username = document.getString("username") ?: "Unknown User"
+                                //Passes email and username so relevant states can be updated
                                 userLogsIn(user.email ?: "", username, user.uid)
                             }
-                            .addOnFailureListener { exception ->
-                                _error.postValue("Failed to retrieve username: ${exception.message}")
+                            .addOnFailureListener {
+                                _error.postValue("Failed to retrieve username.")
                             }
                     }
                 } else {
@@ -244,7 +266,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
+    //When user logs out
     fun userLogsOut(){
+        //Update relevant UI states
         _uiState.update{
                 currentState -> currentState.copy(
             isLoggedIn = false,
@@ -254,9 +278,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             incorrectLogin = false
         )
         }
+        //Clear SharedPreferences so user doesn't remain logged-in when they re-open the app
         clearLoginState()
     }
 
+    //False until user has successful sign-up
     fun newSignUp(){
         _uiState.update{
                 currentState -> currentState.copy(
@@ -265,7 +291,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //On user login
     private fun userLogsIn(currentEmailInput:String, currentUsernameInput: String, userUID: String){
+        //Updating relevant states
         _uiState.update{
             currentState -> currentState.copy(
                 isLoggedIn = true,
@@ -275,24 +303,27 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 incorrectLogin = false
         )
         }
+        //Clear login page inputs
         emailInput = ""
         passwordInput = ""
+        //Save login states to SharedPreferences for consistent login session
         saveLoginState(true, currentEmailInput, currentUsernameInput, userUID)
     }
 
     //Sign Up funcs
+
+    //Updates when use inputs details on sign-up page
     fun updateSignUpEmailInput(currentEmailInput:String){
         signUpEmailInput = currentEmailInput
     }
-
     fun updateSignUpPasswordInput(currentPasswordInput:String){
         signUpPasswordInput = currentPasswordInput
     }
-
     fun updateSignUpUsernameInput(currentUsernameInput:String){
         signUpUsernameInput = currentUsernameInput
     }
 
+    //Validates user's sign up details
     fun checkSignUpDetails() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -302,58 +333,70 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
 
+        //Regular expression to validate email
         //https://regexr.com/3e48o
         val emailPattern = Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$")
 
+        //If email doesn't match regular expression
         if (!emailPattern.matches(signUpEmailInput)) {
+            //Display error to user
             _uiState.update { it.copy(signUpEmailError = "Invalid email format.") }
         }
-
+        //If username is too short
         if (signUpUsernameInput.length < 3) {
+            //Display error
             _uiState.update { it.copy(signUpUsernameError = "Username must be at least 3 characters long.") }
         }
-
+        //If password is too short
         if (signUpPasswordInput.length < 6) {
+            //Display error
             _uiState.update { it.copy(signUpPasswordError = "Password must be at least 6 characters long.") }
         }
-
+        //If any errors flagged do not create user
         if (_uiState.value.signUpEmailError != "" ||
             _uiState.value.signUpUsernameError != "" ||
             _uiState.value.signUpPasswordError != "") {
             return
         }
 
-
-
+        //When no errors are flagged create the user using Firebase auth
         auth.createUserWithEmailAndPassword(signUpEmailInput, signUpPasswordInput)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     user?.let {
+                        //Mapping user inputs to username/email
                         val userDetails = mapOf(
                             "username" to signUpUsernameInput,
                             "email" to signUpEmailInput
                         )
+                        //Create copy of user in Firebase, not including password
+                        //Using Firebase auth UID for users document ID
                         db.collection("users").document(user.uid).set(userDetails)
                             .addOnSuccessListener {
+                                //When successful clear user inputs for login/sign-up
                                 signUpEmailInput = ""
                                 signUpPasswordInput = ""
                                 signUpUsernameInput = ""
                                 emailInput = ""
                                 passwordInput = ""
-
+                                //Set state to true to redirect user to log-in page
                                 _uiState.update { currentState ->
                                     currentState.copy(
                                         isSignedUp = true
                                     )
                                 }
                             }
-                            .addOnFailureListener { exception ->
-                                _error.postValue("Failed to save user info: ${exception.message}")
+                            .addOnFailureListener {
+                                _error.postValue("Failed to save user info")
                             }
                     }
-                } else {
+                }
+                else
+                {
+                    //Get returned error message
                     val exceptionMessage = task.exception?.message ?: ""
+                    //Reformatting error message and displaying it to user
                     if (exceptionMessage.contains("email address is already in use", ignoreCase = true)) {
                         _uiState.update { it.copy(signUpEmailError = "Email is already in use.") }
                     } else {
@@ -364,7 +407,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //Shared Preferences funcs
-    //Save login state to persistence storage
+    //Save login state for consistency across opening/closing the application
     fun saveLoginState(isLoggedIn: Boolean, email: String, username: String, uid: String) {
         sharedPreferences.edit().apply {
             putBoolean("isLoggedIn", isLoggedIn)
@@ -375,7 +418,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    //Clear login persistent state(on logout)
+    //Clear persistent login state (on logout)
     fun clearLoginState() {
         sharedPreferences.edit().apply {
             clear()
@@ -383,13 +426,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    //Restore application state from SharedPreferences on app initialized
+    //Restores login state from SharedPreferences on app initialized
     fun restoreLoginState() {
         val loggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
         val email = sharedPreferences.getString("loggedInEmail", "") ?: ""
         val username = sharedPreferences.getString("loggedInUsername", "") ?: ""
         val uid = sharedPreferences.getString("loggedInUID", "") ?: ""
-
+        //Update UI state from SharedPreferences values
         _uiState.update { currentState ->
             currentState.copy(
                 isLoggedIn = loggedIn,
@@ -403,12 +446,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     //Home page funcs
     //DB check to not display movies already in watchlist or watched
      fun checkMovieInWatchlist(movieID: Int){
+            //Get watchlisted movies attached to the logged in user
             db.collection("users")
                 .document(_uiState.value.loggedInUID)
                 .collection("watchlist")
                 .document(movieID.toString())
                 .get()
                 .addOnSuccessListener { watchlistCheck->
+                    //If movie is found in watchlist
                     if(watchlistCheck.exists())
                     {
                         //Set UI state true
@@ -428,24 +473,24 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
                 .addOnFailureListener{
-                    //TODO: What to do if check fails
+                    //If check fails just mark movie as watchlisted to ensure smooth operation
                     _uiState.update{
                             currentState -> currentState.copy(
-                        movieInWatchlist = false
+                        movieInWatchlist = true
                     )
                     }
-                    Log.d("Watchlist check failed", "Check has failed")
-
                 }
     }
 
     fun checkMovieInWatched(movieID: Int){
+        //Get watched movies attached to the logged in user
         db.collection("users")
             .document(_uiState.value.loggedInUID)
             .collection("watched")
             .document(movieID.toString())
             .get()
             .addOnSuccessListener { watchlistCheck->
+                //If movie is found in watched
                 if(watchlistCheck.exists())
                 {
                     //Set UI state true
@@ -465,13 +510,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             .addOnFailureListener{
-                //TODO: What to do if check fails
+                //If check fails just mark movie as watched to ensure smooth operation
                 _uiState.update{
                         currentState -> currentState.copy(
-                    movieInWatched = false
+                    movieInWatched = true
                 )
                 }
-                Log.d("Watched check failed", "Check has failed")
             }
     }
 
@@ -479,9 +523,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     //Swipe left
     fun removeMovie(index: Int) {
         val currentList = _movies.value?.toMutableList() ?: return
+        //For index of swiped movie
         if (index in currentList.indices) {
+            //Remove movie at this index
             currentList.removeAt(index)
-            _movies.value = currentList // Update the LiveData
+            //Update live data object to reflect removed movie
+            _movies.value = currentList
         }
     }
 
@@ -501,7 +548,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         moviePath.set(movieDetails)
             .addOnSuccessListener {
-                // Success
                 Log.d("Movie to Watched:","Movie added to watched")
             }
             .addOnFailureListener {
@@ -522,7 +568,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             .document(_uiState.value.loggedInUID)
             .collection("watchlist")
             .document(id.toString())
-
+        //Add to DB
         moviePath.set(movieDetails)
             .addOnSuccessListener {
                 Log.d("Movie to Watchlist:","Movie added to Watchlist")
