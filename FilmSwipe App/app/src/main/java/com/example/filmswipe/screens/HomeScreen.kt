@@ -48,8 +48,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.filmswipe.model.AppViewModel
 import kotlin.math.abs
 
-//TODO: Fix the refresh issue, potentially because of how it checks last movie
-
 @Composable
 fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     val appUiState by appViewModel.uiState.collectAsState()
@@ -62,6 +60,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
 
     BackHandler {  }
 
+    //When home screen first launched fetch movies
     LaunchedEffect(Unit){
         //Get screen title for top nav
         appViewModel.getScreenTitle(navController)
@@ -95,8 +94,6 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
             //If API call is successful
             //For each movie in movies, reversed as makes it easier to work with the indexes
             for (index in movies.indices.reversed()) {
-                //TODO: LOOK AT THIS TO SEE ABOUT FIXING THE REFRESH ISSUE
-
                 //Check if current movie is in users watchlist/watched
                 appViewModel.checkMovieInWatchlist(movieID = movies[index].id)
                 appViewModel.checkMovieInWatched(movieID = movies[index].id)
@@ -119,6 +116,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                         onSwipeLeft = {
                             //When movie is swiped left remove it from the movie list
                             appViewModel.removeMovie(index)
+                            //If no movies fetch more
                             if (movies.isEmpty()) {
                                 appViewModel.fetchPopularMovies()
                             }
@@ -128,6 +126,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                             appViewModel.addMovieToWatchlist(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
                             //Remove movie from movie list
                             appViewModel.removeMovie(index)
+                            //If no movies fetch more
                             if (movies.isEmpty()) {
                                 appViewModel.fetchPopularMovies()
                             }
@@ -137,6 +136,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                             appViewModel.addMovieToWatched(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
                             //Remove movie from movie list
                             appViewModel.removeMovie(index)
+                            //If no movies fetch more
                             if (movies.isEmpty()) {
                                 appViewModel.fetchPopularMovies()
                             }

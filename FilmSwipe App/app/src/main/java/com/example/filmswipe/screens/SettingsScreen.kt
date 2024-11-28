@@ -2,16 +2,13 @@ package com.example.filmswipe.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,17 +66,6 @@ fun SettingsScreen(navController: NavController, appViewModel: AppViewModel, mod
         }
 
         HorizontalDivider(color = MaterialTheme.colorScheme.onBackground, thickness = 1.dp)
-
-        Row(modifier= Modifier
-            .padding(5.dp)
-            .fillMaxWidth()
-            .clickable {  }, //TODO: Make functional (passing activity context by view model??)
-            verticalAlignment = Alignment.CenterVertically)
-        {
-            Text(text = "Quit Application",
-                modifier = modifier.padding(10.dp),
-                style= MaterialTheme.typography.labelLarge)
-        }
 
     }
 }
