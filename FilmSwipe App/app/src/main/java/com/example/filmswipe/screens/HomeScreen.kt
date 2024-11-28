@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,6 +47,8 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.filmswipe.model.AppViewModel
 import kotlin.math.abs
+
+//TODO: Fix the refresh issue, potentially because of how it checks last movie
 
 @Composable
 fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifier: Modifier = Modifier) {
@@ -106,7 +109,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                     appViewModel.removeMovie(index)
                     //TODO: CHANGE HOW THIS WORKS AS I THINK THIS IS CAUSE OF REFRESH??
                     //If the last movie has already been seen/watched fetch more movies
-                    //as wont be able to apply this login to the swipable card swipe
+                    //as wont be able to apply this login to the swipe-able card swipe
                     //functions
                     if(isLastMovie) {
                         appViewModel.fetchPopularMovies()
@@ -114,7 +117,7 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                 }
                 else
                 {
-                    //Creates swipable card from current movie if not already in watched or watchlist
+                    //Creates swipe-able card from current movie if not already in watched or watchlist
                     SwipableCard(
                         navController = navController,
                         movieId = movies[index].id,
@@ -168,10 +171,10 @@ fun SwipableCard(
     onSwipeRight: () -> Unit = {},
     onSwipeUp: () -> Unit = {}
 ) {
-    //States local to swipeable card so don't need to be in appUiState
+    //States local to swipable card so don't need to be in appUiState
     //Offset to track swipe
-    var offsetX by remember { mutableStateOf(0f) }
-    var offsetY by remember { mutableStateOf(0f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var offsetY by remember { mutableFloatStateOf(0f) }
     //State to track whether the card is currently being swiped
     var isSwiping by remember { mutableStateOf(false) }
     //How far user must swipe to trigger either left, right or up swipe functions

@@ -39,6 +39,12 @@ import com.example.filmswipe.ui.theme.FilmSwipeTheme
 //For opening lin in web browser
 //https://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application
 
+//For shared preferences
+//https://blog.mansi.dev/difference-between-androidviewmodel-and-viewmodel
+
+//For email validation
+//https://regexr.com/3e48o
+
 
 
 class MainActivity : ComponentActivity() {

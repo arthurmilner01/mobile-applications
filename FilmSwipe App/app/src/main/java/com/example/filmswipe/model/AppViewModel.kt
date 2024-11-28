@@ -13,7 +13,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.filmswipe.data.CastMember
@@ -39,9 +38,6 @@ import kotlin.random.Random
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     //TODO: Comment and see if can be split to multiple files
 
-    private val _uiState = MutableStateFlow(AppUiState())
-    val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
-
     //User input
     //Log In
     var emailInput by mutableStateOf("")
@@ -54,13 +50,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     var changePasswordCurrentPasswordInput by mutableStateOf("")
     var changePasswordPasswordInput by mutableStateOf("")
     var changePasswordConfirmPasswordInput by mutableStateOf("")
+    // Search
+    var searchText by mutableStateOf("")
+
+    //uiState
+    private val _uiState = MutableStateFlow(AppUiState())
+    val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
 
     //SharedPreferences
     private val sharedPreferences: SharedPreferences = application.getSharedPreferences("userState", Context.MODE_PRIVATE)
-
-    // Search
-    var searchText by mutableStateOf("")
-    var searchCheckbox by mutableStateOf(false)
 
     //Database
     //Auth firebase instance
@@ -69,7 +67,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val db = Firebase.firestore
 
     //API
-    val apiKey = "bee0c37b9c1a2d1c1ecf80b6cce631a5"
+    private val apiKey = "bee0c37b9c1a2d1c1ecf80b6cce631a5"
 
     //Live data object for movies
     private val _movies = MutableLiveData<List<Movie>>()
@@ -120,7 +118,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 //API call with random page number
-                //TODO: TEST IF THIS IS A VALID RANGE
+                //TODO: TEST IF THIS IS A VALID RANGE, OR MAKE API CALL TO GET THE NUMBER OF PAGES BEFORE FETCHING MOVIES
                 val pageNumber = Random.nextInt(1,100)
                 val response = RetrofitInstance.api.getPopularMovies(apiKey, pageNumber, _uiState.value.watchProviderFilter)
 
@@ -280,7 +278,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
         emailInput = ""
         passwordInput = ""
-        saveLoginState(true, currentEmailInput, currentUsernameInput, userUID);
+        saveLoginState(true, currentEmailInput, currentUsernameInput, userUID)
     }
 
     //Sign Up funcs
