@@ -60,12 +60,12 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
 
     BackHandler {  }
 
-    //When home screen first launched fetch movies
-    LaunchedEffect(Unit){
+    LaunchedEffect(movies.isEmpty()) {
         //Get screen title for top nav
         appViewModel.getScreenTitle(navController)
-        //If there are no movies to swipe fetch more movies
-        if (movies.isEmpty()) {
+        //If movies is empty and it is not loading a previous API call
+        if (movies.isEmpty() && !loading) {
+            //Fetch more movies
             appViewModel.fetchPopularMovies()
         }
     }
@@ -116,30 +116,18 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                         onSwipeLeft = {
                             //When movie is swiped left remove it from the movie list
                             appViewModel.removeMovie(index)
-                            //If no movies fetch more
-                            if (movies.isEmpty()) {
-                                appViewModel.fetchPopularMovies()
-                            }
-                            },
+                        },
                         onSwipeRight = {
                             //When movie is swiped right add movie to watchlist
                             appViewModel.addMovieToWatchlist(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
                             //Remove movie from movie list
                             appViewModel.removeMovie(index)
-                            //If no movies fetch more
-                            if (movies.isEmpty()) {
-                                appViewModel.fetchPopularMovies()
-                            }
                         },
                         onSwipeUp = {
                             //When movie is swiped up add movie to watched
                             appViewModel.addMovieToWatched(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
                             //Remove movie from movie list
                             appViewModel.removeMovie(index)
-                            //If no movies fetch more
-                            if (movies.isEmpty()) {
-                                appViewModel.fetchPopularMovies()
-                            }
                         }
                     )
                     //Update UI state to details of the currently displayed movie
