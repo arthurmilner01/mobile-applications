@@ -93,12 +93,10 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
         }
         else{
             //If API call is successful
-            //For each movie in movies, reversed as makes it easier to work with
+            //For each movie in movies, reversed as makes it easier to work with the indexes
             for (index in movies.indices.reversed()) {
                 //TODO: LOOK AT THIS TO SEE ABOUT FIXING THE REFRESH ISSUE
 
-                //Checking if last movie in movies
-                val isLastMovie = index == movies.size - 1
                 //Check if current movie is in users watchlist/watched
                 appViewModel.checkMovieInWatchlist(movieID = movies[index].id)
                 appViewModel.checkMovieInWatched(movieID = movies[index].id)
@@ -107,13 +105,6 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                 //and remove from list
                 if(appUiState.movieInWatched || appUiState.movieInWatchlist){
                     appViewModel.removeMovie(index)
-                    //TODO: CHANGE HOW THIS WORKS AS I THINK THIS IS CAUSE OF REFRESH??
-                    //If the last movie has already been seen/watched fetch more movies
-                    //as wont be able to apply this login to the swipe-able card swipe
-                    //functions
-                    if(isLastMovie) {
-                        appViewModel.fetchPopularMovies()
-                    }
                 }
                 else
                 {
@@ -128,28 +119,28 @@ fun HomeScreen(navController: NavController, appViewModel: AppViewModel, modifie
                         onSwipeLeft = {
                             //When movie is swiped left remove it from the movie list
                             appViewModel.removeMovie(index)
-                            //If this is the last movie fetch more movies
-                            if(isLastMovie) {
+                            if (movies.isEmpty()) {
                                 appViewModel.fetchPopularMovies()
-                            } },
+                            }
+                            },
                         onSwipeRight = {
                             //When movie is swiped right add movie to watchlist
                             appViewModel.addMovieToWatchlist(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
                             //Remove movie from movie list
                             appViewModel.removeMovie(index)
-                            //If this is the last movie fetch more movies
-                            if(isLastMovie) {
+                            if (movies.isEmpty()) {
                                 appViewModel.fetchPopularMovies()
-                            } },
+                            }
+                        },
                         onSwipeUp = {
                             //When movie is swiped up add movie to watched
                             appViewModel.addMovieToWatched(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
                             //Remove movie from movie list
                             appViewModel.removeMovie(index)
-                            //If this is the last movie fetch more movies
-                            if(isLastMovie){
+                            if (movies.isEmpty()) {
                                 appViewModel.fetchPopularMovies()
-                            }}
+                            }
+                        }
                     )
                     //Update UI state to details of the currently displayed movie
                     appViewModel.getCurrentMovie(movies[index].id,movies[index].title, movies[index].overview, movies[index].poster_path)
