@@ -45,6 +45,12 @@ import com.example.filmswipe.ui.theme.FilmSwipeTheme
 //For email validation
 //https://regexr.com/3e48o
 
+//For getting images as base64 for insertion into firebase
+//https://stackoverflow.com/questions/9224056/android-bitmap-to-base64-string
+
+//For converting base64 to a bitmap image for displaying in the app
+//https://stackoverflow.com/questions/4837110/how-to-convert-a-base64-string-into-a-bitmap-image-to-show-it-in-a-imageview
+
 
 
 class MainActivity : ComponentActivity() {

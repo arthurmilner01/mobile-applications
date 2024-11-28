@@ -118,7 +118,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 //API call with random page number
-                //TODO: TEST IF THIS IS A VALID RANGE, OR MAKE API CALL TO GET THE NUMBER OF PAGES BEFORE FETCHING MOVIES
                 val pageNumber = Random.nextInt(1,100)
                 val response = RetrofitInstance.api.getPopularMovies(apiKey, pageNumber, _uiState.value.watchProviderFilter)
 
@@ -486,7 +485,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    //Runs on swipe up
+    //Runs on swipe up or when clicked on movie details
     fun addMovieToWatched(id:Int, title:String, overview:String, poster_path:String?) {
         //Mapping movie details to db fields
         val movieDetails = mapOf(
@@ -505,11 +504,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 // Success
                 Log.d("Movie to Watched:","Movie added to watched")
             }
-            .addOnFailureListener { exception ->
-                Log.d("Movie to Watched:", "Movie failed to add to watched$exception")
+            .addOnFailureListener {
+                Log.d("Movie to Watched:", "Movie failed to add to watched")
             }
     }
 
+    //Runs on swipe right or when clicked on movie details
     fun addMovieToWatchlist(id:Int, title:String, overview:String, poster_path:String?) {
         //Mapping movie details to db fields
         val movieDetails = mapOf(
@@ -525,16 +525,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         moviePath.set(movieDetails)
             .addOnSuccessListener {
-                // Success
                 Log.d("Movie to Watchlist:","Movie added to Watchlist")
             }
-            .addOnFailureListener { exception ->
-                Log.d("Movie to Watchlist:", "Movie failed to add to Watchlist$exception")
+            .addOnFailureListener {
+                Log.d("Movie to Watchlist:", "Movie failed to add to Watchlist")
             }
     }
 
-
-    //Stores current movie to swipe details
+    //Stores currently displayed movie's details
     fun getCurrentMovie(movieID:Int, movieTitle:String, movieOverview:String, moviePosterPath:String?){
         _uiState.update{
                 currentState -> currentState.copy(
@@ -546,42 +544,48 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         )
         }
     }
-    //Filter by streaming service
-    fun removeStreamingFilter(streamingService:String){
-        Log.d("UIState", "Current Watch Provider Filter: ${_uiState.value.watchProviderFilter}")
 
+    //When user disables a filter remove it from watch provider filter
+    fun removeStreamingFilter(streamingService:String){
         _uiState.update{
                 currentState -> currentState.copy(
+                    //Update state
                     watchProviderFilter = _uiState.value.watchProviderFilter
-                        .split("|")//Splits by comma
-                        .filter { it != streamingService }  //Removes the given number/streaming service
-                        .joinToString("|") //Converts back into string
-                        .trim() //Removes spaces
-        )
-        }
-        Log.d("UIState", "Current Watch Provider Filter: ${_uiState.value.watchProviderFilter}")
+                        //Splitting string by | if there is more than one filter active
+                        .split("|")
+                        //Removes the given streaming service ID
+                        .filter { it != streamingService }
+                        //Converts back into full string
+                        .joinToString("|")
+                        //Remove spaces
+                        .trim()
+        )}
     }
 
+    //When user enables a filter add it to the watch provider filter
     fun addStreamingFilter(streamingService: String){
-        Log.d("UIState", "Current Watch Provider Filter: ${_uiState.value.watchProviderFilter}")
+        //If the watchproviderfilter is empty (no other filters are active)
         if(_uiState.value.watchProviderFilter == ""){
             _uiState.update{
                     currentState -> currentState.copy(
+                //Append the streaming service ID to the watch provider filter string
                 watchProviderFilter = _uiState.value.watchProviderFilter + streamingService
             )
             }
         }
+        //If watchproviderfilter is not empty
         else{
             _uiState.update{
                     currentState -> currentState.copy(
+                //Add | to ensure all filters are simultaneously active and append streaming service ID to end of string
                 watchProviderFilter = _uiState.value.watchProviderFilter + "|" + streamingService
             )
             }
         }
-        Log.d("UIState", "Current Watch Provider Filter: ${_uiState.value.watchProviderFilter}")
-
     }
 
+
+    //Update states based on users filter selection
     fun setDisneyFilter(){
         if(_uiState.value.disneyFilter){
             _uiState.update{
@@ -600,6 +604,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //Update states based on users filter selection
     fun setPrimeFilter(){
         if(_uiState.value.primeFilter){
             _uiState.update{
@@ -618,6 +623,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //Update states based on users filter selection
     fun setNetflixFilter(){
         if(_uiState.value.netflixFilter){
             _uiState.update{
@@ -638,6 +644,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
 
     //Profile page funs
+
+    //When user selects Watched button
     fun showProfilesLikedMovies(){
         _uiState.update{
                 currentState -> currentState.copy(
@@ -646,6 +654,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //When user selects Watchlist button
     fun showProfilesWatchlist(){
         _uiState.update{
                 currentState -> currentState.copy(
@@ -707,130 +716,130 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         .addOnSuccessListener {
                             Log.d("updateUserProfilePicture", "Profile picture updated successfully")
                         }
-                        .addOnFailureListener { exception ->
-                            Log.d("updateUserProfilePicture", "Failed to update profile picture: ${exception.message}")
+                        .addOnFailureListener {
+                            Log.d("updateUserProfilePicture", "Failed to update profile picture")
                         }
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.d("updateUserProfilePicture", "Failed to find user: ${exception.message}")
+            .addOnFailureListener {
+                Log.d("updateUserProfilePicture", "Failed to find user")
             }
     }
 
 
     fun usersWatchedMovies(email: String) {
-        //Path to the users watched movies
+        //Path to the viewed users watched movies
         db.collection("users")
             .whereEqualTo("email", email)
             .get()
             .addOnSuccessListener { queryResults ->
+                //If result isn't empty
                 if (!queryResults.isEmpty) {
                     val document = queryResults.documents[0]
                     val userId = document.id
-
+                    //Grabbing movies attached to users watched
                     val watchedRef = db.collection("users")
                         .document(userId)
                         .collection("watched")
 
                     watchedRef.get()
                         .addOnSuccessListener { watchedResults ->
-                            //toObjects simply maps the returned data to the
-                            //same Movie data class used by returned API data
-                            //uses class.java because of Firestore
+                            //toObject simply maps the returned data to the
+                            //ProfileMovie data class
+                            //Gets list of movie objects which will be displayed using ProfileMovieCard
                             val watchedMovies = watchedResults.documents.mapNotNull { doc ->
                                 val movie = doc.toObject(ProfileMovie::class.java)
-                                movie?.copy(id = doc.id) //Assign the movie ID from document ID
+                                //Assign the movie ID from document ID as these are the same (movie ID is used as document ID when marked as watched)
+                                movie?.copy(id = doc.id)
                             }
+                            //Adding the movies returned to watched movies live data
                             _watchedMovies.value = watchedMovies
                         }
-                        .addOnFailureListener { exception ->
-                            Log.d("Error getting watched movies:", "Failed$exception")
-                            _watchedMovies.value = emptyList() //Set empty on failure
+                        .addOnFailureListener {
+                            Log.d("Error getting watched movies:", "Failed")
+                            _watchedMovies.value = emptyList() //Set empty on failure so profile will just load with not movies under watched
                         }
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.d("Error finding user:", "Failed$exception")
+            .addOnFailureListener {
+                Log.d("Error finding user:", "Failed")
             }
     }
 
 
     fun usersWatchlistedMovies(email: String) {
-        //Path to the users watched movies
+        //Path to the users watchlist movies
         db.collection("users")
             .whereEqualTo("email", email)
             .get()
             .addOnSuccessListener { queryResults ->
+                //If result isn't empty
                 if (!queryResults.isEmpty) {
                     val document = queryResults.documents[0]
                     val userId = document.id
-
+                    //Grabbing movies attached to users watchlist
                     val watchlistRef = db.collection("users")
                         .document(userId)
                         .collection("watchlist")
 
                     watchlistRef.get()
                         .addOnSuccessListener { watchlistResults ->
-                            //toObjects simply maps the returned data to the
-                            //same Movie data class used by returned API data
-                            //uses class.java because of Firestore
+                            //toObject simply maps the returned data to the
+                            //ProfileMovie data class
+                            //Gets list of movie objects which will be displayed using ProfileMovieCard
                             val watchlistedMovies = watchlistResults.documents.mapNotNull { doc ->
                                 val movie = doc.toObject(ProfileMovie::class.java)
-                                movie?.copy(id = doc.id) //Assign the movie ID from document ID
+                                //Assign the movie ID from document ID as these are the same (movie ID is used as document ID when marked as watched)
+                                movie?.copy(id = doc.id)
                             }
+                            //Adding the movies returned to watchlist movies live data
                             _watchlistMovies.value = watchlistedMovies
                         }
-                        .addOnFailureListener { exception ->
-                            Log.d("Error getting watchlist:", "Failed$exception")
-                            _watchlistMovies.value = emptyList() //Set empty on failure
+                        .addOnFailureListener {
+                            Log.d("Error getting watchlist:", "Failed")
+                            _watchlistMovies.value = emptyList() //Set empty on failure so profile will just load with no movies under watched
                         }
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.d("Error finding user:", "Failed$exception")
+            .addOnFailureListener {
+                Log.d("Error finding user:", "Failed")
             }
     }
 
     fun removeMovieFromWatched(id:Int) {
-        //Gets path where to movie will be deleted
+        //Gets path where the movie will be deleted
         val moviePath = db.collection("users")
             .document(_uiState.value.loggedInUID)
             .collection("watched")
             .document(id.toString())
-
+        //Deletes movie in that path from the db
         moviePath.delete()
             .addOnSuccessListener {
-                // Success
                 Log.d("Movie to Watched:","Movie removed from watched")
             }
-            .addOnFailureListener { exception ->
-                Log.d("Movie to Watched:", "Movie failed to remove from watched$exception")
+            .addOnFailureListener {
+                Log.d("Movie to Watched:", "Movie failed to remove from watched")
             }
     }
 
     fun removeMovieFromWatchlist(id:Int) {
-        //Gets path where to movie will be deleted
+        //Gets path where the movie will be deleted
         val moviePath = db.collection("users")
             .document(_uiState.value.loggedInUID)
             .collection("watchlist")
             .document(id.toString())
-
+        //Deletes movie in that path from the db
         moviePath.delete()
             .addOnSuccessListener {
-                // Success
                 Log.d("Movie to Watchlist:","Movie removed from watchlist")
             }
-            .addOnFailureListener { exception ->
-                Log.d("Movie to Watchlist:", "Movie failed to remove from watchlist$exception")
+            .addOnFailureListener {
+                Log.d("Movie to Watchlist:", "Movie failed to remove from watchlist")
             }
     }
 
-    //Settings page funcs
-
-
-
     //Top bar funcs
-    //Used to map nav host title to the displayed title
+    //Used to map nav host title to the title which will be displayed on the UI
     private val screenTitles = mapOf(
         "homescreen" to "Home",
         "profilescreen" to "Profile",
@@ -841,6 +850,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         "changepasswordscreen" to "Change Password"
     )
 
+    //Function to update the current screen's title so UI will update, also tracks what page user is viewing and updates states accordingly
     fun getScreenTitle(navController: NavController){
         val currentScreen = navController.currentBackStackEntry?.destination?.route
         _uiState.update{
@@ -848,6 +858,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             navScreenTitle =  screenTitles[currentScreen] ?: " " //Empty title if no title
         )
         }
+        //If screen title is "" it means user is on movie details page so update states
         if(screenTitles[currentScreen] == ""){
             _uiState.update{
                     currentState -> currentState.copy(
@@ -857,6 +868,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             )
             }
         }
+        //If screen title is "Home" it means user is on home page so update states
         else if(screenTitles[currentScreen] == "Home"){
             _uiState.update{
                     currentState -> currentState.copy(
@@ -866,6 +878,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             )
             }
         }
+        //If screen title is "Change Password" it means user is on change password page so update states
         else if(screenTitles[currentScreen] == "Change Password"){
             _uiState.update{
                     currentState -> currentState.copy(
@@ -875,6 +888,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             )
             }
         }
+        //If none of these set states to false
         else
         {
             _uiState.update{
@@ -887,6 +901,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //Changes state to expand watch filter menu
     fun expandFilterMenu(){
         _uiState.update{
                 currentState -> currentState.copy(
@@ -895,6 +910,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //Changes state to dismiss filter menu
     fun dismissFilterMenu(){
         _uiState.update{
                 currentState -> currentState.copy(
@@ -904,6 +920,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //Bottom bar funcs
+
+    //Updates bottom nav bar visually so icon for current page icon has selected page styling
     fun changeNavSelectedItem(index:Int){
         _uiState.update{
             currentState -> currentState.copy(
@@ -913,6 +931,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
 
     //Search Funcs
+
+    //Clears previous search results and gets new user input
+    //Runs when search input is updated
     fun updateSearchQuery(newSearchText:String){
         searchText = newSearchText
         _searchResults.postValue(emptyList())
@@ -920,28 +941,30 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
+    //When user searches for users
     fun performUserSearch() {
+        //Get current search input
         val currentQuery = searchText
         db.collection("users")
             //Search usernames
+            //https://inorganik.medium.com/implementing-a-simple-effective-search-in-firebase-with-just-firestore-957dd716ccdb
             .whereGreaterThanOrEqualTo("username", currentQuery)
             .whereLessThanOrEqualTo("username", currentQuery + '\uf8ff')
             .whereNotEqualTo("username", _uiState.value.loggedInUsername)
             .get()
             .addOnSuccessListener { queryResults ->
-                //List to store usernames
+                //List of FilmSwipeUser objects to store returned users
                 val users = mutableListOf<FilmswipeUser>()
 
-                Log.d("performUserSearch", "Number of users found: ${queryResults.size()}")
-
-                // Loop through the results and extract usernames
+                //For each user in result
                 for (document in queryResults) {
-                    //Grab current users username and profile picture
+                    //Grab username and profile picture
                     val username = document.getString("username")
                     val profilePicture = document.getString("profile_picture")
                     val email = document.getString("email")
-                    //Creating filmswipe user object
+                    //Creating FilmSwipe user object and inserting into users list initalised above
                     if (username != null && email != null) {
+                        //Create FilmswipeUser object
                         val filmswipeUser = FilmswipeUser(username, profilePicture, email)
                         users.add(filmswipeUser) //Add to users list
                     }
@@ -949,32 +972,38 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 //Adds the users to the live data object
                 _userSearchResults.postValue(users)
             }
-            .addOnFailureListener { exception ->
-                _error.postValue("Search failed: ${exception.message}")
+            .addOnFailureListener {
+                _error.postValue("Search failed.")
             }
     }
 
     //Toggle box changes search type
     fun changeSearchType(checkBoxValue:Boolean){
+        //When true search for users
         if(checkBoxValue){
             _uiState.update{
                     currentState -> currentState.copy(
                 searchingUsers = true
             )}
+            //Clear search input and live data when changed
             searchText = ""
             _searchResults.postValue(emptyList())
         }
+        //When false search for movies
         else{
             _uiState.update{
                     currentState -> currentState.copy(
                 searchingUsers = false
             )}
+            //Clear search input and live data when changed
             searchText = ""
             _searchResults.postValue(emptyList())
         }
     }
 
     //Movie details funcs
+
+    //When Crew button is selected
     fun showMovieCrew(){
         _uiState.update{
                 currentState -> currentState.copy(
@@ -983,6 +1012,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //When Cast button is selected
     fun showMovieCast(){
         _uiState.update{
                 currentState -> currentState.copy(
@@ -991,12 +1021,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //API call fetches  currently viewed movie's genre and user rating
     fun fetchMovieDetails(movieId: Int) {
         viewModelScope.launch {
             try {
+                //Get API call response
                 val response = RetrofitInstance.api.getMovieDetails(movieId, apiKey)
+                //If response is successful
                 if (response.isSuccessful) {
                     response.body()?.let { details ->
+                        //Update UI state with returned values for displaying
                         _uiState.update { currentState ->
                             currentState.copy(
                                 currentMovieGenres = details.genres.map { it.name },
@@ -1005,7 +1039,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         }
                     }
                 } else {
-                    Log.e("fetchMovieDetails", "Error: ${response.message()}")
+                    Log.e("fetchMovieDetails", "Error")
                 }
             } catch (e: Exception) {
                 Log.e("fetchMovieDetails", "Exception: ${e.message}")
@@ -1015,20 +1049,19 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
 
     //Change Password Funcs
+
+    //Updating user inputs on change password page
     fun updateChangePasswordCurrentPasswordInput(currentPasswordInput: String){
         changePasswordCurrentPasswordInput = currentPasswordInput
     }
-
     fun updateChangePasswordPasswordInput(password:String){
         changePasswordPasswordInput = password
     }
-
     fun updateChangePasswordConfirmPasswordInput(confirmPassword:String){
         changePasswordConfirmPasswordInput = confirmPassword
     }
 
     fun checkChangePasswordDetails() {
-        // Reset error messages and success state
         _uiState.update { currentState ->
             currentState.copy(
                 changePasswordCurrentPasswordError = "",
