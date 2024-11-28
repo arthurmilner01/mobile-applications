@@ -18,8 +18,7 @@ import com.example.filmswipe.navigation.BottomNavigationBar
 import com.example.filmswipe.navigation.TopNavigationBar
 import com.example.filmswipe.ui.theme.FilmSwipeTheme
 
-//Bibliography:
-//TODO: Format correctly
+//Sources:
 //For API
 //https://medium.com/@kathankraithatha/how-to-use-api-in-jetpack-compose-10d11b8f166f
 
@@ -36,7 +35,7 @@ import com.example.filmswipe.ui.theme.FilmSwipeTheme
 //https://www.youtube.com/watch?v=s1WXrB9fv8Q
 //https://www.youtube.com/watch?v=UqNnpt3OfhE
 
-//For opening lin in web browser
+//For opening link in web browser
 //https://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application
 
 //For shared preferences
@@ -65,11 +64,12 @@ class MainActivity : ComponentActivity() {
             val appViewModel: AppViewModel = viewModel()
 
             FilmSwipeTheme(navController = navController, appViewModel = appViewModel){
+                //Restoring login session with SharedPreferences
                 LaunchedEffect(Unit) {
                     appViewModel.restoreLoginState()
                 }
                 Scaffold(modifier = Modifier.fillMaxSize(),
-                    ////Passing nav controller/view model to top and bottom nav bars
+                    //Passing nav controller/view model to top and bottom nav bars
                     topBar = { TopNavigationBar(navController, appViewModel)},
                     bottomBar = {BottomNavigationBar(navController, appViewModel)}) { innerPadding ->
                     Box(modifier=Modifier.padding(innerPadding)) {

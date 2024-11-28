@@ -180,10 +180,10 @@ fun SwipableCard(
     val ratingBackgroundColor = when {
         voteAverage >= 8.0 -> Color(0xFF4CC452) //Green for high ratings
         voteAverage >= 5.0 -> Color(0xFFDCA60D) //Yellow for medium ratings
-        else -> Color(0xFFF44336)              //Red for low ratings
+        else -> Color(0xFFF44336) //Red for low ratings
     }
 
-    //Opening movie detail in browser
+    //For opening movie reviews in browser
     val context = LocalContext.current
 
     Box(
@@ -265,7 +265,7 @@ fun SwipableCard(
                         .align(Alignment.TopEnd)
                         .padding(13.dp)
                         .clickable{
-                            //TODO: Cite source from bibliography about links in browser
+                            //Opens link in web browser
                             val tmdbUrl = "https://www.themoviedb.org/movie/${movieId}"
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(tmdbUrl))
                             context.startActivity(intent)

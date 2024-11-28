@@ -450,7 +450,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             db.collection("users")
                 .document(_uiState.value.loggedInUID)
                 .collection("watchlist")
-                .document(movieID.toString())
+                .document(movieID.toString()) //Stored as string in Firebase
                 .get()
                 .addOnSuccessListener { watchlistCheck->
                     //If movie is found in watchlist

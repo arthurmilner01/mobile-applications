@@ -10,17 +10,16 @@ data class AppUiState(
 
     //Signup
     val isSignedUp:Boolean = false, //When user successfully signs up
-    val signUpEmailError: String? = "",
-    val signUpUsernameError: String? = "",
-    val signUpPasswordError: String? = "",
+    val signUpEmailError: String? = "", //To display errors regarding signing-up to the user
+    val signUpUsernameError: String? = "", //To display errors regarding signing-up to the user
+    val signUpPasswordError: String? = "", //To display errors regarding signing-up to the user
 
     //Change Password
-    //TODO: Comment
     val viewingChangePassword:Boolean = false, //If user is viewing change password
-    val changePasswordCurrentPasswordError: String? = "",
-    val changePasswordPasswordError: String? = "",
-    val changePasswordConfirmPasswordError: String? = "",
-    val isUpdatedPasswordSuccess:Boolean = false,
+    val changePasswordCurrentPasswordError: String? = "", //To display errors regarding changing password to the user
+    val changePasswordPasswordError: String? = "", //To display errors regarding changing password to the user
+    val changePasswordConfirmPasswordError: String? = "", //To display errors regarding changing password to the user
+    val isUpdatedPasswordSuccess:Boolean = false, //If change password was successful
 
 
     //Navbars
