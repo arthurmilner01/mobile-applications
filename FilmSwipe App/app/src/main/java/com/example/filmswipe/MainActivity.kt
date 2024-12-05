@@ -53,6 +53,9 @@ import com.example.filmswipe.ui.theme.FilmSwipeTheme
 //AndroidViewModel application context for persistent storage using SharedPreferences
 //https://blog.mansi.dev/difference-between-androidviewmodel-and-viewmodel
 
+//For handling back arrow/back swiping with BackHandler{}
+//https://stackoverflow.com/questions/68560948/how-to-handle-back-navigation-with-jetpack-compose-navigation-without-fragmen
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
