@@ -65,7 +65,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val db = Firebase.firestore
 
     //API key
-    private val apiKey = "bee0c37b9c1a2d1c1ecf80b6cce631a5"
+    private val apiKey = "******"
 
     //Live data object for movies
     private val _movies = MutableLiveData<List<Movie>>()
